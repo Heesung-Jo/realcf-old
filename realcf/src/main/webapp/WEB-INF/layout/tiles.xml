@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+  <definition name="base" template="/WEB-INF/layout/page.jsp">
+    <put-attribute name="header" value="/WEB-INF/layout/header.jsp" />
+    <put-attribute name="footer" value="/WEB-INF/layout/footer.jsp" />
+  </definition>
+
+  <definition name="loginsuccess" extends="base">
+    <put-attribute name="body" value="/WEB-INF/views/loginsuccess.jsp" />
+  </definition>
+
+  <definition name="start" extends="base">
+    <put-attribute name="body" value="/WEB-INF/views/start.jsp" />
+  </definition>
+
+  <definition name="explanation" extends="base">
+    <put-attribute name="body" value="/WEB-INF/views/explanation.jsp" />
+  </definition>
+
+  <definition name="gojs9" extends="base">
+    <put-attribute name="body" value="/WEB-INF/views/gojs9.jsp" />
+  </definition>
+
+
+
+
+  <definition name="profile" extends="base">
+    <put-attribute name="body" value="/WEB-INF/views/profile.jsp" />
+  </definition>
+
+  <definition name="spittles" extends="base">
+    <put-attribute name="body" value="/WEB-INF/views/spittles.jsp" />
+  </definition>
+
+  <definition name="spittle" extends="base">
+    <put-attribute name="body" value="/WEB-INF/views/spittle.jsp" />
+  </definition>
+
+</tiles-definitions>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title id="pageTitle">myCalendar - Please Login</title>
+
+ </head>
+<body>
+
+<div class="container">
+   
+    <form action = "login" method="POST" cssClass="form-horizontal">
+
+        <div th:if="${param.error != null}" class="alert alert-danger">
+            <strong>Failed to login.</strong>
+
+            <span th:if="${session[SPRING_SECURITY_LAST_EXCEPTION] != null}">
+                <span th:text="${session[SPRING_SECURITY_LAST_EXCEPTION].message}">Invalid credentials</span>
+            </span>
+        </div>
+        <div th:if="${param.logout != null}" class="alert alert-success">
+            You have been logged out.
+        </div>
+
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" autofocus="autofocus"/>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"/>
+        <div class="control-group">
+            <div class="controls">
+                <input id="submit" type="submit" name="submit" value="Login"/>
+            </div>
+        </div>
+    </form>
+
+    <form action="/signin/google" method="POST" class="form-horizontal">
+        <input type="hidden" name="scope" value="public_profile" />
+        <div class="form-actions">
+            <input id="google-submit" class="btn" type="submit" value="Login using google"/>
+        </div>
+    </form>
+
+</div>
+
+
+</body>
+</html>

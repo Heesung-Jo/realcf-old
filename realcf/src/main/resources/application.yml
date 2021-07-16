@@ -1,0 +1,57 @@
+#------------------------------------------------------------------------------#
+# Application YAML #
+# inside ./src/main/resources/application.yml
+#------------------------------------------------------------------------------#
+debug: false
+
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/view/
+      suffix: .jsp
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+    view-names: thymeleaf/*
+  ## H2 Servlet setting
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+      path: /admin/h2
+
+  # Embedded Database
+  datasource:
+    url: jdbc:h2:mem:dataSource;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 1234
+    continue-on-error: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  security:
+    oauth2:
+      client:
+         registration:
+           google:
+            client-id: 96514128794-jkel3c3i6cji7vb57faj7akqedvcpfed.apps.googleusercontent.com 
+            client-secret: OKwarwLosnTnAhuYCaWixD6V
+            
+
+
+
+
+
+# Turn off Security for Actuator:
+management:
+  security:
+    enabled: false
+
+
+##---------------------------------------------------------------------------##
