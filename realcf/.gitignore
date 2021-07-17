@@ -33,4 +33,4 @@ build/
 .vscode/
 
 #### 설정파일 ####
-application.yml
+application-oauth.yml

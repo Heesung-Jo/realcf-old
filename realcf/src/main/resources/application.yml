@@ -5,6 +5,8 @@
 debug: false
 
 spring:
+  profiles:
+     include: oauth
   mvc:
     view:
       prefix: /WEB-INF/view/
@@ -30,19 +32,12 @@ spring:
     username: sa
     password: 1234
     continue-on-error: true
+            
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     hibernate:
       ddl-auto: create-drop
-  security:
-    oauth2:
-      client:
-         registration:
-           google:
-            client-id: 96514128794-jkel3c3i6cji7vb57faj7akqedvcpfed.apps.googleusercontent.com 
-            client-secret: OKwarwLosnTnAhuYCaWixD6V
-            
 
 
 
