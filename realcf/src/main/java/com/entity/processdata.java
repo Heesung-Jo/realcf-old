@@ -50,8 +50,6 @@ public class processdata {
 	 @OneToMany(mappedBy = "processdata", cascade = CascadeType.ALL)
 	 private List<parentnodedata> parentnodedata = new ArrayList<>();
 	 
-	 @OneToOne(mappedBy = "processdata", cascade = CascadeType.ALL)
-	 private coadata coadata; 
 
 	 
 	 // childnode 관련
@@ -245,13 +243,5 @@ public class processdata {
      
      
      
-     public void setcoadata(coadata act) {
-    	 this.coadata = act;
-    	 act.setprocessdata(this);
-     }
-     
-     public coadata getcoadata() {
-    	 return coadata;
-     }
 
 }

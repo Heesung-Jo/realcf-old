@@ -34,37 +34,23 @@ import com.entity.processdata;
 
 import javax.inject.Inject;
 
-
+@Service
 public class xlmake { 
 
-	
-	 private String name; 
-	 private String val;
-
-	 private String realword;
-	 private HashMap<String, Integer> word_dict = new HashMap<>();
-	 private ArrayList<ArrayList<String>> reallist = new ArrayList<>();
-	 private ArrayList<String> remainlist = new ArrayList<>();
-	 private int realprob = 0;
-
-
-	 
-	 public xlmake(String word) {
-		 this.realword = word;
-		 
-
+	 public xlmake() {
+		 //this.realword = word;
 	 }
            
 
 	    // xl 사용하기 위해서 테스트
-	    public void listmake(String sheetname, String name, int row1, int row2, String para)
+	    public void listmake(String sheetname, String filename, int row1, int row2, xlsubwork sub)
 	   		 throws ClassNotFoundException, IllegalAccessException, InstantiationException
 	         ,NoSuchMethodException, InvocationTargetException 
 	    {
 	      // 각 배열에 앞뒤로 집어넣기, pos는 엑셀 열의 위치를 부여하기
 	      	
 	      try {
-	      	FileInputStream fis = new FileInputStream("C:\\java\\gob\\프로토타입\\계정\\" + name); ///usr/local/gob/"
+	      	FileInputStream fis = new FileInputStream("C:\\java\\gob\\프로토타입\\계정\\" + filename); ///usr/local/gob/"
 	      	HSSFWorkbook book = new HSSFWorkbook(fis);
 	      	HSSFSheet sheet = book.getSheet(sheetname);
 	      	
@@ -78,22 +64,10 @@ public class xlmake {
 	      		
 	      		HSSFRow row = sheet.getRow(num);
 	         
-	  	        ArrayList<JSONObject> sentences = new ArrayList<>();
-	  	        JSONObject obj = new JSONObject();
-	  	        String activitystring = "";
 	  	    
 	      	    int existing = 1;
 	      	    if(row != null) {
-	      	      //subwork(row, pro);
-	      	      	
-	      	      // 아래쪽에 서브클래스에 subwork 함수를 만들고 익명클래스로 subwork를 오버라이드해서 그것으로 즉시 인스턴스화해서 사용할까도 고려했으나, 
-	      	      // 예시 위쪽에서 함수 실행시키기 전에 new subclass(){@override
-	      	      //	                                  subwork(){ ~~~~ 할일을 불라불라 기재 ~~~ } 
-	      	      // 이것을 매개변수로 넘기기. 이렇게하면 위에가 너무 지저분해지므로       	    	
-	      	      // 일단은 invoke를 사용함	
-	      	    	System.out.println(Integer.valueOf(row.getCell(1).toString()));
-	      	    	word_dict.put(row.getCell(0).toString(), Integer.valueOf(row.getCell(1).toString()));
-	              
+	      	      sub.work(row);   // 주작업을 할 내용
 	      	    }
 	      	
 	      	}
@@ -106,7 +80,9 @@ public class xlmake {
 	      
 	    }   
 	 
-	 
+	 public void work() {
+		 
+	 }
 	 
 
 }

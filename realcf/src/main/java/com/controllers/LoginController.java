@@ -53,6 +53,7 @@ import com.entity.teamdata;
 
 
 import com.service.mywork;
+import com.service.companywork;
 import com.service.coaarray;
 
 @Controller
@@ -66,6 +67,10 @@ public class LoginController {
 	private memberService memberservice;
 	@Autowired
 	private mywork mywork;
+	
+	@Autowired
+	private companywork companywork;
+	
 
     private final UserContext userContext;
     private final memberService memberService;
@@ -139,8 +144,8 @@ public class LoginController {
     @GetMapping("/view/explanation")
     public String explanation(Model mav) {
 
-    	coaarray coa = mywork.getcoaarray("확정급여");
-    	System.out.println(coa.getlist_sort());
+    	System.out.println(8989898);
+    	companywork.setting();
     	
     	/* 데이터마이닝 위하여 파이썬 플라스크를 사용할 계획이었고, 이렇게 테스트 하였을 때 성공하였음
     	      다만, 데이터마이닝 유효성이 그렇게 높지 않아서, 삭제함
@@ -298,7 +303,6 @@ public class LoginController {
               	// coa 저장
               	coadata coa = new coadata();
               	coa.setname(request.getParameter(pro + "_hidden"));
-              	process.setcoadata(coa);
 
       		}
         	

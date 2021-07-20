@@ -71,7 +71,7 @@ public class DefaultmemberService implements memberService {
         member user = new member();
         user.setEmail("gochoking@naver.com");
         user.setname("jo hee sung");
-        user.setPassword("{noop}1234");
+        user.setPassword("{noop}12341234");
 
      //   logger.info("CalendarUser: {}", user);
 

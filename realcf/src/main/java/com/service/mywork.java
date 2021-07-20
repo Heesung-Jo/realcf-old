@@ -85,7 +85,7 @@ public class mywork {
 
     
     public void setting() {
-
+       
     	// invoke 대신에 익명클래스를 활용해봄
 
     	System.out.println("why not");

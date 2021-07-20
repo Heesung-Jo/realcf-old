@@ -41,7 +41,7 @@ public class processrepository {
     		// 하부 클래스도 모두 id 갈아끼어주기
     		// 추가되는 클래스도 있으면 모두 수정하기
     		// 혹시 한번에 되는게 있는지 jpa 책 찾아볼 것
-    	    pro.getcoadata().setid(pro_old.getcoadata().getid());
+    	    //pro.getcoadata().setid(pro_old.getcoadata().getid());
     	}
 
     	
