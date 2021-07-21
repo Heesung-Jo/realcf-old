@@ -7,8 +7,6 @@
   <definition name="base" template="/WEB-INF/layout/page.jsp">
     <put-attribute name="header" value="/WEB-INF/layout/header.jsp" />
     <put-attribute name="footer" value="/WEB-INF/layout/footer.jsp" />
-    <put-attribute name="menu" value="/WEB-INF/layout/menu1.jsp" />
-
   </definition>
 
   <definition name="loginsuccess" extends="base">
@@ -27,21 +25,22 @@
     <put-attribute name="body" value="/WEB-INF/views/gojs9.jsp" />
   </definition>
 
+  <definition name="search" extends="base">
+    <put-attribute name="body" value="/WEB-INF/views/search.jsp" />
+  </definition>
+
+
 
   <definition name="profile" extends="base">
     <put-attribute name="body" value="/WEB-INF/views/profile.jsp" />
   </definition>
 
-
-  <definition name="second" template="/WEB-INF/layout/page.jsp">
-    <put-attribute name="header" value="/WEB-INF/layout/header.jsp" />
-    <put-attribute name="footer" value="/WEB-INF/layout/footer.jsp" />
-    <put-attribute name="menu" value="/WEB-INF/layout/menu2.jsp" />
-
+  <definition name="spittles" extends="base">
+    <put-attribute name="body" value="/WEB-INF/views/spittles.jsp" />
   </definition>
 
-  <definition name="search" extends="second">
-    <put-attribute name="body" value="/WEB-INF/views/search.jsp" />
+  <definition name="spittle" extends="base">
+    <put-attribute name="body" value="/WEB-INF/views/spittle.jsp" />
   </definition>
 
 </tiles-definitions>

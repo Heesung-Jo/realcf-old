@@ -23,15 +23,7 @@
     </style>
     <!-- í¤ë -->
     <style>
-        #main_header {
-            height: 60px;
-            line-height: 60px;
-            padding-left: 10px;
-            border-bottom: 1px solid black;
 
-            background: #1D4088;
-            color: white;
-        }
     </style>
     <!-- ë¤ë¹ê²ì´ì -->
     <style>
@@ -129,25 +121,18 @@
         
     </style>
 </head>
-<body>
-    <header id="main_header">
-        <h1>내부회계시스템</h1>
-    </header>
-    <nav id="main_gnb">
-        <ul class="left">
-            <li><a href="#">Button</a></li>
-            <li><a href="#">Button</a></li>
-        </ul>
-    </nav>
+
+    
+    <t:insertAttribute name="header" />
+    
+
+
     <div id="wrap">
         <nav id="main_lnb">
             <ul>
-                <li><a href="start">원장입력</a></li>
-                <li><a href="myshowing">자신의 업무보기</a></li>
-                <li><a href="gojs9">플로우차트</a></li>
-                <li><a href="explanation">이해하기</a></li>
+               <t:insertAttribute name="menu" />  
             </ul>
-        </nav>
+         </nav>
        <div id="content_wrap">
             <t:insertAttribute name="body" />
        </div>

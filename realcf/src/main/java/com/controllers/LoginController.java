@@ -135,10 +135,25 @@ public class LoginController {
         return model;
 
     }
+
+    
+    @GetMapping("/view/second")
+    public String second(Model model) {
+    	System.out.println("why why why");
+      return "search";
+    }
+    @GetMapping("/view/search")
+    public String search(Model model) {
+    	System.out.println("why why why");
+      return "search";
+    }
+
+    
+    
     
     @GetMapping("/view/home")
     public String home(Model model) {
-      return "home";
+      return "start";
     }
 
     @GetMapping("/view/explanation")
