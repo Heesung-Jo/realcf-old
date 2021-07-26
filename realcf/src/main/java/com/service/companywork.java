@@ -86,6 +86,11 @@ public class companywork {
            
     } 
 	
+    public financialstatements findbyname(String name) {
+    	return financialstatementsRepository.findByname(name);
+    }
+    
+    
     
     public void setting() {
       /*
@@ -171,7 +176,23 @@ public class companywork {
     	
     }
     
- 
+    public HashMap<String, JSONObject> toresponse(Set<coadata> coas){
+    	
+    	
+    	HashMap<String, JSONObject> temp = new HashMap<>();
+    	for(coadata coa : coas) {
+    		
+    		// 필요한 데이터 추출하여 json에 집어넣기
+    		JSONObject json = new JSONObject();
+    		json.put("name", coa.getname());
+    		json.put("bspl", coa.getbspl());
+    		json.put("number", coa.getnumber());
+    		json.put("val", coa.getval());
+    		temp.put(coa.getname(), json);
+    	}
+    	
+    	return temp;
+    }
 	      
 }      
     

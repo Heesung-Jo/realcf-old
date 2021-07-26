@@ -20,4 +20,5 @@ public interface CustomCoadataRepository  {
 
 	List<coadata> getprocessquery(String name1, String name2, String para1, String para2);
 	List<coadata> getprocessquery(ArrayList<String> names, ArrayList<String> paras);
+	List<coadata> getprocessquery(ArrayList<String> businesses, ArrayList<String> coas, ArrayList<String> companys);
 } // The End...

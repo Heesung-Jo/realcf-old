@@ -9,23 +9,15 @@
 <head>
     <title>원장분석</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- ë³¸ë¬¸ììë ë¤ë£¨ì§ ìì ì½ëìëë¤. ë¶ë¡ Aìì ì´í´ë³´ë íë¬ê·¸ì¸ìëë¤. -->
-    <!--  êµ¬ ë²ì ì ì¸í°ë· ìµì¤íë¡ë¬ìì HTML5 íê·¸ë¥¼ ì¸ìíê² í©ëë¤. -->
-    <!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!-- ì´ê¸°í -->
     <style>
         * { margin: 0; padding: 0; }
         body { font-family: 'Helvetica', sans-serif; }
         li { list-style: none; }
         a { text-decoration: none; }
     </style>
-    <!-- í¤ë -->
     <style>
 
     </style>
-    <!-- ë¤ë¹ê²ì´ì -->
     <style>
         #main_gnb {
             overflow: hidden;
@@ -43,13 +35,10 @@
         #main_gnb > ul.left > li { float: left; }
         #main_gnb > ul.right > li { float: left; }
 
-        /* a íê·¸ ì¤ì  */
         #main_gnb a {
-            /* ë ì´ìì ì¤ì  */
             display: block;
             padding: 10px 20px;
 
-            /* ìì ì¤ì  */
             border-left: 1px solid #5F6673;
             border-right: 1px solid #242A37;
             color: white;
@@ -72,7 +61,6 @@
         }
         #wrap > #content_wrap > #content { padding-right: 200px; }
     </style>
-    <!-- ìì§ ëª©ë¡ -->
     <style>
         #wrap { background: #71B1D1; }
         #main_lnb > ul > li > a {
@@ -86,7 +74,6 @@
             font-weight: bold;
         }
     </style>
-    <!-- ë³¸ë¬¸ -->
     <style>
         #content {
             background: white;

@@ -81,5 +81,48 @@ public class CoadataRepositoryImpl implements CustomCoadataRepository {
 		
 		return abc.getResultList();
 	}	    
+
+	@Transactional
+	public List<coadata> getprocessquery(ArrayList<String> businesses, ArrayList<String> coas, ArrayList<String> companys){
+        
+		// 나중에 수정할 것, company가 있는 것은 이 코드가 아님
+		List<coadata> process = new ArrayList<coadata>();
+		StringBuilder jpql = new StringBuilder("select m from coadata m where ");
+		List<String> criteria = new ArrayList<String>();
+        
+		int num = 0;
+        int testcode = 0;
+		// businesses 쿼리 집어넣기
+		for(String i : businesses) {
+			num += 1;
+			if(num == 0) {
+				criteria.add("(m.business  = :name" + num);
+				if(num > 1) {testcode = 1;}
+			}else if(num == businesses.size()) {
+				criteria.add("m.business  = :name" + num + ")");
+			}else {
+				criteria.add("m.business  = :name" + num + " or ");
+			}
+			jpql.append(criteria.get(criteria.size() - 1));
+
+		}
+		
+		
+		// coa 쿼리 집어넣기
+		
+		TypedQuery<coadata> abc = em.createQuery(jpql.toString(), coadata.class);
+		
+		num = 0;
+		for(String i : businesses) {
+			num += 1;
+			abc = abc.setParameter("name" + num, i);
+		}
+        
+		System.out.println("success");
+		
+		return abc.getResultList();		
+		
+	}
+	
 	
 } // The End...

@@ -1,6 +1,11 @@
- <%@ page contentType="text/html; charset=utf-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=utf-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>   
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
+<%@ taglib uri="http://www.springframework.org/tags" prefix="s" %>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="t" %>
+<%@ page session="false" %>
+
             <form id="search" method = "post" action = "">
                 
                 </br>
@@ -30,7 +35,10 @@
                     </span>
                 </div>
                 
-                
+                </br>
+                <div>
+                    <input type ="button" id = "submitbutton" value = "제출하기" style = "width: 300px"/>
+                </div>
             
             </form>
             
@@ -81,6 +89,7 @@ span {
 
 </style>            
             
+<script src = "http://code.jquery.com/jquery-3.4.1.js"></script>
             
 <script type="text/javascript">
 
@@ -95,12 +104,22 @@ class showing{
 	  this.coa = document.getElementById("coa");           
 
 	  
+	  // 회사선택, 계정선택 등을 위한 구성화면과 그에 따른 리스너
+	  this.businessarr = new Set([]); // 서버에서 받아올 것
+	  this.coaarr = new Set([]);  // 서버에서 받아올 것
+	  this.companyarr = new Set([]); // 서버에서 받아올 것
+	  
+	  // 임시의 코드임
+	  this.businessarr.add("반도체")
+      this.coaarr.add("투자주식")
+      this.companyarr.add("삼성전자")
+	  this.companyarr.add("3S")
+	  
 	  this.businessbutton = document.getElementById("businessplus");  // 내용(select) + x표시
 	  this.companybutton = document.getElementById("companyplus");    // 내용(text) +  x표시 
 	  this.coabutton = document.getElementById("coaplus");            // 내용(select) + 금액/비율 + x표시
 	  
-	  this.businessarr = []; // 서버에서 받아올 것
-	  this.coaarr = [];  // 서버에서 받아올 것
+	  this.submitbutton = document.getElementById("submitbutton"); 
 	  
 	  // x 버튼을 누르면 삭제하기 위해서 만듬
 	  this.businessbutton.addEventListener('click',(me) => {
@@ -118,8 +137,100 @@ class showing{
 		  this.coa.appendChild(div);
      });        
 
-
+	  // 제출하기 버튼. 안의 값이 비었는지 등을 확인하고 서버에 요청하자
+      
+	  this.submitbutton.addEventListener('click',(me) => {
+              this.submittest();
+	  });        
+	  
+	  
 	}
+	
+	
+	async submittest(){
+		// 먼저 값들이 모두 들어가 있는지 확인하기
+		var arr = [this.business, this.coa, this.company]
+		var data = {"business": new Set([]), "coa": new Set([]), "company": new Set([])}
+		
+		for(var i in arr){
+	        for(var k = 0; k < arr[i].childNodes.length; k++){
+                
+	        	// 어떤 요소인지 찾기
+	        	var id = arr[i].id;
+	        	
+	        	var select = arr[i].childNodes[k].querySelector("select");
+	        	
+	        	if(select != null){
+	        		var val = select.value;
+	        		if(this[id + 'arr'].has(val) == false){
+	        			alert(id + "을 올바르게 선택해주세요");
+	        			return
+	        		}else{
+	        		    data[id].add(val)	
+	        		}
+	        	}
+	            
+	        	var text = arr[i].childNodes[k].querySelector("input[type=text]");
+	        	if(text != null){
+	        		var val = text.value;
+		        	if(this[id + 'arr'].has(val) == false){
+		        		alert(id + "을 올바르게 선택해주세요");
+		        		return
+		        	}else{
+		        		data[id].add(val)
+		        	}
+	        	}
+	        	
+	       }
+		}
+		
+		// data 변환
+		for(var i in data){
+			data[i] = Array.from(data[i])
+		}
+		
+		
+		// ajaxmethod
+		this.ajaxmethod("searchrequest", data);
+		
+	}
+	
+	
+	ajaxmethod(link, data, act){
+		
+		return new Promise((resolve) => {
+		
+		// 스프링 시큐리티 관련
+		var header = $("meta[name='_csrf_header']").attr('content');
+		var token = $("meta[name='_csrf']").attr('content');
+		
+   		$.ajax({
+   			type : "POST",
+   			url : "/view/" + link,
+   			data : data,
+   			beforeSend: function(xhr){
+   			  if(token && header) {
+   				  //console.log(header);
+   				  //console.log(token);
+   		       // xhr.setRequestHeader(header, token);
+   			  } 
+   		    },
+   		    success : (res) => {
+   				
+   		    	console.log(res)
+   		    	resolve()
+                
+   		    	
+   				
+ 
+   			},
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+                   console.log(errorThrown + " " + textStatus);
+            }
+   		})		
+	  })
+	}	
 	
 	makediv(opt1, opt2, opt3){
 		// 내용 + 금액/비율 + x표시
@@ -163,9 +274,9 @@ class showing{
     makeselect(arr){
         var select = document.createElement('select');
         
-        for(var i in arr){
+        for(var i of arr){
             var opt = document.createElement('option');
-            opt.innerText = arr[i];
+            opt.innerText = i;
             select.appendChild(opt)
         }
         return select;
