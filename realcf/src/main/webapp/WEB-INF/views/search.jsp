@@ -40,6 +40,10 @@
                     <input type ="button" id = "submitbutton" value = "제출하기" style = "width: 300px"/>
                 </div>
             
+                </br>
+                <div id = 'tablediv'>
+                </div>
+                
             </form>
             
             
@@ -87,6 +91,37 @@ span {
   padding: 0px;
 }
 
+
+table {
+    border: 1px solid #444444;
+    border-collapse: collapse;
+    
+  }
+  
+table th {
+  border: 1px solid #444444;
+  font-weight: bold;
+  background: #dcdcd1;
+  width: 200px;
+  height: 20px;
+}
+
+table td {
+    border: 1px solid #444444;
+    background: white;
+    height: 20px;
+}
+
+
+select {
+      width: 100%;
+      height: 100%;
+      border: 0px;
+}
+
+
+
+
 </style>            
             
 <script src = "http://code.jquery.com/jquery-3.4.1.js"></script>
@@ -105,15 +140,14 @@ class showing{
 
 	  
 	  // 회사선택, 계정선택 등을 위한 구성화면과 그에 따른 리스너
-	  this.businessarr = new Set([]); // 서버에서 받아올 것
-	  this.coaarr = new Set([]);  // 서버에서 받아올 것
-	  this.companyarr = new Set([]); // 서버에서 받아올 것
+	  this.businessarr = []; // 서버에서 받아올 것
+	  this.coaarr = [];  // 서버에서 받아올 것
+	  this.companyarr = []; // 서버에서 받아올 것
+	  
+	  this.searcharr = {}; // user의 요청에 대한 서버의 회신 arr
 	  
 	  // 임시의 코드임
-	  this.businessarr.add("반도체")
-      this.coaarr.add("투자주식")
-      this.companyarr.add("삼성전자")
-	  this.companyarr.add("3S")
+	  this.businessarr.push("반도체")
 	  
 	  this.businessbutton = document.getElementById("businessplus");  // 내용(select) + x표시
 	  this.companybutton = document.getElementById("companyplus");    // 내용(text) +  x표시 
@@ -143,6 +177,19 @@ class showing{
               this.submittest();
 	  });        
 	  
+	  var func = (res) => {
+		  this.coaarr = new Set(res.coa)
+		  this.companyarr = new Set(res.company)
+		  console.log(this.coaarr)
+	  }
+
+      this.ajaxmethod("searcharray", {}, func);
+
+	  
+	  // 테이블 만들기
+	   this.table = this.maketable();
+ 	   var temp = document.getElementById("tablediv")
+ 	   temp.appendChild(this.table);
 	  
 	}
 	
@@ -191,7 +238,17 @@ class showing{
 		
 		
 		// ajaxmethod
-		this.ajaxmethod("searchrequest", data);
+		
+		var func = (res) => {
+   		    	this.searcharr = res;
+   		    	
+   		    	this.table.parentNode.removeChild(this.table); 
+   		    	this.table = this.maketable(this.searcharr);
+   		    	var temp = document.getElementById("tablediv")
+   		 	    temp.appendChild(this.table);
+		}
+		
+		await this.ajaxmethod("searchrequest", data, func);
 		
 	}
 	
@@ -218,6 +275,7 @@ class showing{
    		    success : (res) => {
    				
    		    	console.log(res)
+                act(res); 
    		    	resolve()
                 
    		    	
@@ -296,6 +354,137 @@ class showing{
         button.addEventListener('click',()=>{this.closediv(button.parentNode)});
         return button;
     } 
+
+	maketable(arr){
+		   
+		   // 이제 집어넣기 
+	       // 테이블 만들어 추가하기
+	   	   var temptable = document.createElement("table");
+		   this.tablearr = {}  // 기존 tablearr 비우기
+	       
+	       // 제목행 
+	       var thead = document.createElement("thead");
+	   	   temptable.appendChild(thead);
+	       var temp = {}
+	       
+	       if(arr){
+		       var count = Object.keys(arr).length + 2
+	       }else{
+	    	   count = 3
+	       }
+
+	       var subdiv = this.maketrtd(temp, count, "th");
+	       temp[0].innerText = "계정명"
+	       temp[1].innerText = "계정종류"
+		   if(arr){
+			   var count = Object.keys(arr).length + 2
+		       num = 0;
+			   for(var i in arr){
+		        	   temp[num + 2].innerText = i;
+		               num += 1;
+			   }
+
+		    }else{
+		       temp[2].innerText = "금액"
+	       }
+	       
+	       
+	       thead.appendChild(subdiv);
+
+	       // 내용행
+	       var tbody = document.createElement("tbody");
+	       temptable.appendChild(tbody);
+	       
+	       // 테이블 갯수 최소가 20개이고 배열이 더 많으면 그 이상 만들기
+	       var temcount = arr ? Object.keys(arr).length : 0;
+           var count = Math.max(20, temcount);	       
+           
+   		   
+           if(arr){
+        	    // 회사별 정렬임
+        	    console.log("why")
+     		   // 순서대로 표시하기 위해서 this.coaarr를 활용함
+     		   
+        	   for(var k of this.coaarr){
+                   var check = 0;
+                   var num = 0;
+                   var temparr = {}
+                   
+                   // 먼저 k란 계정을 반드시 집어넣어야 하는지 체크하기
+                   for(var j in arr){
+        			   num += 1;
+    				   if(k in arr[j]){
+    					   check = 1;
+    					   break
+    				   }
+    			   }
+        		   
+                   // 체크가 되었다면, 이제 집어넣기
+        		   if(check == 1){
+    	    		   var temp = {}
+           			   var subdiv = this.maketrtd(temp, count);
+              		   tbody.appendChild(subdiv)
+
+        			   temp[0].innerText = arr[j][k]['name'];
+    			       temp[1].innerText = arr[j][k]['bspl'];
+    			       var num = 0;
+                       for(var j in arr){
+            			   
+        				   if(k in arr[j]){
+        					   check = 1;
+        					   console.log(arr[j][k])
+        				       temp[2 + num].innerText = arr[j][k]['val'];
+        				   }
+        				   num += 1;
+        			   }
+    			       
+        		   }
+
+    		   }
+
+	       }else{
+	    	   for(var i = 0; i < 20; i++){
+	    		   var temp = {}
+       			   var subdiv = this.maketrtd(temp, count);
+          		   tbody.appendChild(subdiv)
+	    		   
+	    	   }
+	       }   
+	        
+	      
+
+	       return temptable;
+	   }	   
+	   
+	   
+	   maketrtd(arr, count, td, stylearr){
+	       
+	       var div = document.createElement("tr");
+	    	for(var i = 0; i < count;i++){
+
+	    		if(td){
+	            	var subdiv = document.createElement(td)
+	    		}else if(i == 0){
+	            	var subdiv = document.createElement("th")
+	            	
+	       	}else{
+	            	var subdiv = document.createElement("td")
+	       	}
+
+	   	   arr[i] = subdiv;
+	   	   
+	   	   
+	   	   for(var j in stylearr){
+	       	   subdiv.setAttribute(j, stylearr[j]);
+	   	   }
+	   	   
+	   	   div.appendChild(subdiv);
+	    	}
+	   	return div
+	   }    
+    
+    
+    
     
     closediv(item){
     	item.parentNode.removeChild(item); 
@@ -306,7 +495,7 @@ class showing{
 
 window.onload = () => {
 	show = new showing()
-	
+
 }
 
 </script>

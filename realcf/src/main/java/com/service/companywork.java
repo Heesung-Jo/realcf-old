@@ -79,6 +79,8 @@ public class companywork {
     @Autowired
     private xlmake xlmake;
 
+    private ArrayList<String> coaturnarr = new ArrayList<>();
+    private HashSet<String> companyarr = new HashSet<>();
     
     @Autowired
     public void companywork() { 
@@ -103,7 +105,19 @@ public class companywork {
     	
 //    	HSSFRow row;
   //  	row.getCell(0).getNumericCellValue()
-    	// datafordb라는 파일을 db에 저장하기 
+    	
+    	// datafordb라는 파일을 db에 저장하기
+    	
+    	// coaturnobj 시트 저장하기
+    	
+    	xlsubwork coa = new xlsubwork() {
+    		public void work(HSSFRow row) {
+    			coaturnarr.add(row.getCell(0).toString());
+    		}
+    	};
+    	
+    	
+    	// main data sheet 저장하기
     	xlsubwork sub = new xlsubwork() {
     		public void work(HSSFRow row) {
     			coadata coa = new coadata();
@@ -114,12 +128,16 @@ public class companywork {
     			String name = row.getCell(2).toString();
     			String reportname = row.getCell(3).toString();
     			double number = row.getCell(5).getNumericCellValue();
+    			double level = row.getCell(6).getNumericCellValue();
+    			
     			
     			
     			try {
+    				// null값을 허용함
         			double cash = row.getCell(4).getNumericCellValue();
         			coa.setval(cash);
-    				
+        			String parent = row.getCell(7).toString();
+        			coa.setparent(parent);	
     			}catch(Exception e) {
     				      				
     			}
@@ -131,6 +149,8 @@ public class companywork {
     			coa.setreportname(reportname);
     			coa.setnumber(number);
     		    coa.setyear(2020);	
+    		    coa.setlevel(level);
+    		    
     			
     			CoadataRepository.save(coa);
     			
@@ -166,13 +186,21 @@ public class companywork {
     	};
     	
     	try {
-        	xlmake.listmake("data", "datafordb.xls", 1, 100, sub);
+    		xlmake.listmake("coaturn", "datafordb_BS.xls", 0, 90, coa);
+        	//xlmake.listmake("data", "datafordb_BS.xls", 1, 15620, sub);
     		
     	}catch(Exception e) {
             // 결국 이것은 파일이 없는 에러이므로 나중에
     		// 다 throw fileexception으로 처리할 것
     		System.out.println(e);
     	}
+    	
+    	
+    	for(financialstatements com : financialstatementsRepository.findAll()) {
+    		companyarr.add(com.getname());
+    	};
+    	
+    	System.out.println(companyarr.size());
     	
     }
     
@@ -193,7 +221,17 @@ public class companywork {
     	
     	return temp;
     }
-	      
+	     
+    
+   public ArrayList<String> getcoaturnarr(){
+	   return coaturnarr;
+   }
+
+   public HashSet<String> getcompanyarr(){
+	   return companyarr;
+   }
+
+   
 }      
     
     

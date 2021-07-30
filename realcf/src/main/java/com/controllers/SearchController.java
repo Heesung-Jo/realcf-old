@@ -111,7 +111,15 @@ public class SearchController {
 	       
 	}    
 	
+	@PostMapping("/view/searcharray")
+	public ResponseEntity<Object> searcharray(HttpSession session, HttpServletRequest request){
 	
+		HashMap<String, Object> realdata = new HashMap<>();
+		realdata.put("company", companywork.getcompanyarr());
+		realdata.put("coa", companywork.getcoaturnarr());
+		return ResponseEntity.status(HttpStatus.OK).body(realdata);
+    
+		}    
 	
 
 	
