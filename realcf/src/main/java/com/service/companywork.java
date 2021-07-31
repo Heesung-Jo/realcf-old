@@ -39,16 +39,19 @@ import com.entity.nodedata;
 import com.entity.parentnodedata;
 import com.entity.childnodedata;
 import com.entity.coadata;
+import com.entity.coagroupdata;
 import com.entity.financialstatements;
 
 
 import com.repository.processrepository;
 import com.repository.teamrepository;
 import com.repository.RoleRepository;
+import com.repository.coagroupdataRepository;
 import com.repository.memberrepository;
 import com.repository.CoadataRepository;
 import com.repository.CoadataRepositoryImpl;
 import com.repository.financialstatementsRepository;
+import com.repository.coagroupdataRepository;
 import com.entity.Role;
 
 
@@ -74,6 +77,8 @@ public class companywork {
     @Autowired
     private financialstatementsRepository financialstatementsRepository;
     
+    @Autowired
+    private coagroupdataRepository coagroupdataRepository;
     
     
     @Autowired
@@ -109,26 +114,41 @@ public class companywork {
     	// datafordb라는 파일을 db에 저장하기
     	
     	// coaturnobj 시트 저장하기
-    	
+    	// coaturnarr 만들기
     	xlsubwork coa = new xlsubwork() {
     		public void work(HSSFRow row) {
     			coaturnarr.add(row.getCell(0).toString());
     		}
     	};
+ 
     	
+    	xlsubwork coms = new xlsubwork() {
+    		public void work(HSSFRow row) {
+    			String company = row.getCell(0).toString();
+    			financialstatements statement;
+     			statement = new financialstatements();
+    			statement.setname(company);
+    			statement.setyear(2020);
+    			financialstatementsRepository.save(statement);
+   			
+    		};
+    	};
     	
     	// main data sheet 저장하기
     	xlsubwork sub = new xlsubwork() {
     		public void work(HSSFRow row) {
+ 
+    			
+     			
     			coadata coa = new coadata();
     			
-    			String company = row.getCell(0).toString();
+    			
     			String bspl  = row.getCell(1).toString();
-    			System.out.println(company);
     			String name = row.getCell(2).toString();
     			String reportname = row.getCell(3).toString();
     			double number = row.getCell(5).getNumericCellValue();
     			double level = row.getCell(6).getNumericCellValue();
+    			String company = row.getCell(0).toString();
     			
     			
     			
@@ -141,6 +161,7 @@ public class companywork {
     			}catch(Exception e) {
     				      				
     			}
+    		    
     		
     			// coa data db에 저장하기
     			coa.setcompany(company);
@@ -152,27 +173,36 @@ public class companywork {
     		    coa.setlevel(level);
     		    
     			
+    			//statement.addcoadata(coa);
     			CoadataRepository.save(coa);
     			
-    			// financialstatements에 저장하기
-    			financialstatements statement;
+    			
+    			// coagroupdata에 저장하기
+   			
+    			coagroupdata coagroupdata;
     			
     			try {
-    				statement = financialstatementsRepository.findByname(company);
-        			statement.addcoadata(coa);
-        			financialstatementsRepository.save(statement);
-
+    				coagroupdata = coagroupdataRepository.findByCompanyAndLevelAndName(company, level, name);
+    				double cash = row.getCell(4).getNumericCellValue();
+    				coagroupdata.setval(cash + coagroupdata.getval());
+    				coagroupdata.addcoadata(coa);
+    				coagroupdataRepository.save(coagroupdata);
     			}catch(NullPointerException e) {
-    					
+    				coagroupdata = new coagroupdata();
     				System.out.println("come in");
-    				statement = new financialstatements();
-    				statement.setname(company);
-    				statement.setyear(2020);
-    				financialstatementsRepository.save(statement);
-    				
-        			statement.addcoadata(coa);
-        			financialstatementsRepository.save(statement);
-    				
+    				coagroupdata.setcompany(company);
+    				double cash = row.getCell(4).getNumericCellValue();
+    				coagroupdata.setval(cash + coagroupdata.getval());
+
+    				coagroupdata.setbspl(bspl);
+    				coagroupdata.setname(name);
+    				coagroupdata.setyear(2020);	
+    				coagroupdata.setlevel(level);
+    				coagroupdataRepository.save(coagroupdata);
+        		    
+        		    coagroupdata.addcoadata(coa);
+        		    coagroupdataRepository.save(coagroupdata);
+
     			}catch(Exception e) {
     				
     				// 향후 쿼리 이상 throw를 던지는 문구로 바꿀것
@@ -181,13 +211,14 @@ public class companywork {
     			}
     			
     			
-    			
-    		}
+     		}
     	};
     	
     	try {
+    		xlmake.listmake("company", "datafordb_BS.xls", 0, 256, coms);
+    	
     		xlmake.listmake("coaturn", "datafordb_BS.xls", 0, 90, coa);
-        	//xlmake.listmake("data", "datafordb_BS.xls", 1, 15620, sub);
+        	xlmake.listmake("data", "datafordb_BS.xls", 0, 100, sub); // 15619
     		
     	}catch(Exception e) {
             // 결국 이것은 파일이 없는 에러이므로 나중에
@@ -196,6 +227,8 @@ public class companywork {
     	}
     	
     	
+    	
+    	// companyarr이 만들기
     	for(financialstatements com : financialstatementsRepository.findAll()) {
     		companyarr.add(com.getname());
     	};

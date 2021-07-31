@@ -35,9 +35,9 @@ public class financialstatements {
 	 private String name; // 회사이름을 의미
 	 private int year;    // 사업보고서 연도
 
-	 @OneToMany(mappedBy = "financialstatements", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	 private Set<coadata> coadata = new HashSet<>();
 	 
+	 @OneToMany(mappedBy = "financialstatements", cascade = CascadeType.ALL)
+	 private Set<coagroupdata> coagroupdata = new HashSet<>();
 	 
 	 public financialstatements() {
 		 
@@ -72,17 +72,18 @@ public class financialstatements {
          return name; 
      }
 
-     public void setcoadata(HashSet<coadata> act) {
-    	 this.coadata = act;
+
+     public void setcoagroupdata(HashSet<coagroupdata> act) {
+    	 this.coagroupdata = act;
      }
 
-     public void addcoadata(coadata act) {
-    	 this.coadata.add(act);
+     public void addcoagroupdata(coagroupdata act) {
+    	 this.coagroupdata.add(act);
     	 act.setfinancialstatements(this);
      }
 
-     public Set<coadata> getcoadata() {
-    	 return coadata;
+     public Set<coagroupdata> getcoagroupdata() {
+    	 return coagroupdata;
      }
-
+     
 }

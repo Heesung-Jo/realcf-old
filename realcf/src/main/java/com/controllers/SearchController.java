@@ -56,7 +56,7 @@ public class SearchController {
 	@Autowired
 	private companywork companywork;
 
-
+/*
 	@PostMapping("/view/searchrequest")
 	public ResponseEntity<Object> searchrequest(HttpSession session, HttpServletRequest request,
 			@RequestParam(value="business[]") @Nullable List<String> business,
@@ -110,6 +110,7 @@ public class SearchController {
 		return ResponseEntity.status(HttpStatus.OK).body(realdata);
 	       
 	}    
+*/
 	
 	@PostMapping("/view/searcharray")
 	public ResponseEntity<Object> searcharray(HttpSession session, HttpServletRequest request){

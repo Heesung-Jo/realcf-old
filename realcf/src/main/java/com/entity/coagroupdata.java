@@ -26,7 +26,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 @Entity
-public class coadata { 
+public class coagroupdata { 
 
 	
 	 @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,36 +34,27 @@ public class coadata {
 	 private Long id;	
 	
 	 private String name; // 계정과목 이름을 말함 // 세부분류 계정과목을 뜻함
-	 private String reportname; // 사업보고서 상의 계정과목 이름을 말함
 	 
 	 @Column(nullable = true) 
 	 private double val;        // 금액을 의미함 
 	 private int year;          // 2020년 등 결산기간을 의미함
 	 private String bspl;       // BS/IS/CF를 의미함
 	 private String company;    // 사실 아래의 financialstatements이나, 여기서 간단히 string만으로 조회가능토록 구상
-	 private double number;        // 나중에 회사의 재무제표를 순서대로 보여줄수있도록 number 계정 설정함
 
 	 private double level;         // 레벨에 관련된 열 
-	 private String parent;        // 부모와 관련된 열
 	 
-
 	 @ManyToOne
-     @JoinColumn(name = "coagroupdata_id")
-     private coagroupdata coagroupdata;
+     @JoinColumn(name = "financialstatements_id")
+     private financialstatements financialstatements;
+
+	 @OneToMany(mappedBy = "coagroupdata", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	 private Set<coadata> coadata = new HashSet<>();
 
 	 
-	 
-	 public coadata() {
+	 public coagroupdata() {
 		 
 	 }
 
-	 public void setparent(String parent) {
-		 this.parent = parent;
-	 }
-	 
-	 public String getparent() {
-		 return parent;
-	 }
 
 	 
 	 public void setlevel(double level) {
@@ -75,13 +66,6 @@ public class coadata {
 	 }
 
 	 
-	 public void setnumber(double number) {
-		 this.number = number;
-	 }
-	 
-	 public double getnumber() {
-		 return number;
-	 }
 
 	 public void setbspl(String val) {
 		 this.bspl = val;
@@ -98,17 +82,8 @@ public class coadata {
 	 public String getcompany() {
 		 return company;
 	 }
-
 	 
 	 
-	 
-	 public void setreportname(String val) {
-		 this.reportname = val;
-	 }
-	 
-	 public String getreportname() {
-		 return reportname;
-	 }
 	 public void setyear(int year) {
 		 this.year = year;
 	 }
@@ -142,11 +117,26 @@ public class coadata {
      public String getname(){ 
          return name; 
      }
-     public void setcoagroupdata(coagroupdata x){ 
-         this.coagroupdata = x; 
+
+     public void setfinancialstatements(financialstatements x){ 
+         this.financialstatements = x; 
      }
      
-     public coagroupdata getcoagroupdata(){ 
-         return coagroupdata; 
+     public financialstatements getfinancialstatements(){ 
+         return financialstatements; 
      }
+
+     public void setcoadata(HashSet<coadata> act) {
+    	 this.coadata = act;
+     }
+
+     public void addcoadata(coadata act) {
+    	 this.coadata.add(act);
+    	 act.setcoagroupdata(this);
+     }
+
+     public Set<coadata> getcoadata() {
+    	 return coadata;
+     }     
+     
 }

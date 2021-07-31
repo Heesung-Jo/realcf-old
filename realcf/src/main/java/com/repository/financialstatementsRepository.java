@@ -12,10 +12,14 @@ import javax.persistence.PersistenceContext;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.repository.query.Param;
 
 public interface financialstatementsRepository extends JpaRepository<financialstatements, Integer> {
 
-	financialstatements findByname(String name);
+	@Query("select m from financialstatements m join fetch m.coagroupdata where m.name = :name")
+	//@EntityGraph(attributePaths = {"coadata, coagroupdata"}, type = EntityGraph.EntityGraphType.LOAD)
+	financialstatements findByname(@Param("name") String name);  //
 	
 } // The End...

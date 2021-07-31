@@ -4,6 +4,7 @@ import com.entity.Role;
 import com.entity.coadata;
 import com.entity.coadata;
 import com.entity.member;
+import com.entity.processdata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class CoadataRepositoryImpl implements CustomCoadataRepository {
+public class CoadataRepositoryImpl implements CoadataRepositoryCustom {
 
 
     @PersistenceContext
@@ -123,6 +124,15 @@ public class CoadataRepositoryImpl implements CustomCoadataRepository {
 		return abc.getResultList();		
 		
 	}
-	
+
+	@Transactional
+	public List<Object[]> findmaxval(String name){
+
+		List<processdata> list = em.createQuery("select m.company, sum(m.val) as sums from coadata m group by m.company having m.name = :name order by sums", processdata.class)
+    	.setParameter("name", name).getResultList();
+
+		
+		return null;
+	}	
 	
 } // The End...
