@@ -275,7 +275,11 @@ class showing{
    		    success : (res) => {
    				
    		    	console.log(res)
-                act(res); 
+   		    	if("error" in res){
+   		    		alert(res['error']);
+   		    	}else{
+   	                act(res); 
+   		    	}
    		    	resolve()
                 
    		    	

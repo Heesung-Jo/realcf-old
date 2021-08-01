@@ -1,8 +1,15 @@
 package com.controllers;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,6 +33,8 @@ public class ErrorController {
         StringBuffer sb = new StringBuffer();
         sb.append("Exception during execution of Spring Security application!  ");
 
+        
+        
         sb.append((throwable != null && throwable.getMessage() != null ? throwable.getMessage() : "Unknown error"));
 
         if (throwable != null && throwable.getCause() != null) {
@@ -40,4 +49,9 @@ public class ErrorController {
         return mav;
     }
 
+    
+  
+
+    
+    
 } // The End...

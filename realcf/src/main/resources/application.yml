@@ -16,7 +16,7 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
     cache: false
-    view-names: thymeleaf/*
+    view-names: thymeleaf/*, error/*
   ## H2 Servlet setting
   h2:
     console:
@@ -30,7 +30,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     hibernate:
-      ddl-auto: create #update #create-drop  
+      ddl-auto: update #create #update #create-drop  
 
 
 

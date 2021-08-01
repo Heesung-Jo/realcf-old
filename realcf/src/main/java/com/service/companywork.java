@@ -90,7 +90,7 @@ public class companywork {
     
     @Autowired
     public void companywork() { 
-           setting();
+           //setting();
            // 저장을 한 뒤에는 위에것은 // 처리하면 됨
            setting2();
            
@@ -223,6 +223,14 @@ public class companywork {
     	}
     	
     	
+    	// company에 자식들 채워넣기
+    	for(coagroupdata tempcoa : coagroupdataRepository.findAll()) {
+    		System.out.println(tempcoa.getcompany());
+    		financialstatements statements = financialstatementsRepository.findByname(tempcoa.getcompany());
+    		System.out.println(statements.getname());
+    		statements.addcoagroupdata(tempcoa);   	
+    		financialstatementsRepository.save(statements);
+    	}
     	
     	
     	
@@ -250,14 +258,6 @@ public class companywork {
     		companyarr.add(com.getname());
     	};
     	
-    	// company에 자식들 채워넣기
-    	for(coagroupdata tempcoa : coagroupdataRepository.findAll()) {
-    		System.out.println(tempcoa.getcompany());
-    		financialstatements statements = financialstatementsRepository.findByname(tempcoa.getcompany());
-    		System.out.println(statements.getname());
-    		statements.addcoagroupdata(tempcoa);   	
-    		financialstatementsRepository.save(statements);
-    	}
     	
     }
     

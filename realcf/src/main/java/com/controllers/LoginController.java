@@ -269,7 +269,7 @@ public class LoginController {
         } 
         try {
         	
-        	/*
+        	/* NoSuchPageException
             Member auth = authService.authenticate( loginCommand.getusername(),
                     loginCommand.getPassword());
             System.out.println("123123123");

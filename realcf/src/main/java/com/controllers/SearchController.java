@@ -63,7 +63,7 @@ public class SearchController {
 			@RequestParam(value="coa[]") @Nullable List<String> coa,
 			@RequestParam(value="company[]") @Nullable List<String> company) {
 	
-		System.out.println(123123);
+
 		HashMap<String, Object> realdata = new LinkedHashMap<>();
 		// 로직: company가 있을때는 무조건 company로 조회
 		// 그렇지 않을때는 나머지 두개로 조회
@@ -100,7 +100,7 @@ public class SearchController {
 		}else if(1 == 1) {
 			
 			// 회사명이 주어지지 않았을때 조회하는 코드
-			
+			System.out.println("whywhy");
 			if(coa.size() >= 1) {
 				
 				for(Object[] row : companywork.findmaxval(coa)) {
