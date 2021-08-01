@@ -160,7 +160,7 @@ public class LoginController {
     public String explanation(Model mav) {
 
     	System.out.println(8989898);
-    	companywork.setting();
+    	
     	
     	/* 데이터마이닝 위하여 파이썬 플라스크를 사용할 계획이었고, 이렇게 테스트 하였을 때 성공하였음
     	      다만, 데이터마이닝 유효성이 그렇게 높지 않아서, 삭제함

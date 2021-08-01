@@ -46,7 +46,7 @@ import com.fasterxml.jackson.core.sym.Name;
 
 import com.entity.processdata;
 import com.entity.coadata;
-
+import com.entity.coagroupdata;
 
 @RestController
 @SessionAttributes("process")
@@ -56,7 +56,7 @@ public class SearchController {
 	@Autowired
 	private companywork companywork;
 
-/*
+
 	@PostMapping("/view/searchrequest")
 	public ResponseEntity<Object> searchrequest(HttpSession session, HttpServletRequest request,
 			@RequestParam(value="business[]") @Nullable List<String> business,
@@ -64,14 +64,14 @@ public class SearchController {
 			@RequestParam(value="company[]") @Nullable List<String> company) {
 	
 		System.out.println(123123);
-		HashMap<String, Object> realdata = new HashMap<>();
+		HashMap<String, Object> realdata = new LinkedHashMap<>();
 		// 로직: company가 있을때는 무조건 company로 조회
 		// 그렇지 않을때는 나머지 두개로 조회
 		
 		if(company != null) {
 			for(String com : company) {
 				financialstatements financial = companywork.findbyname(com);
-				Set<coadata> coastemp = financial.getcoadata();
+				Set<coagroupdata> coastemp = financial.getcoagroupdata();
 				HashMap<String, JSONObject> coas = companywork.toresponse(coastemp);
 				
                 int coatest = 0;				
@@ -99,7 +99,46 @@ public class SearchController {
 			
 		}else if(1 == 1) {
 			
-			// 그렇지 않을때 조회하는 코드
+			// 회사명이 주어지지 않았을때 조회하는 코드
+			
+			if(coa.size() >= 1) {
+				
+				for(Object[] row : companywork.findmaxval(coa)) {
+					
+					financialstatements financial = companywork.findbyname(row[0].toString());
+					Set<coagroupdata> coastemp = financial.getcoagroupdata();
+					HashMap<String, JSONObject> coas = companywork.toresponse(coastemp);
+					
+	                int coatest = 0;				
+	                System.out.println(row[0].toString());
+	                if(coa != null) {
+	                
+						// 일부 계정만 조회함
+						HashMap<String, JSONObject> temp = new HashMap<>();
+						for(String text : coa) {
+							if(coas.containsKey(text)) {
+								temp.put(text, coas.get(text));
+							}
+							
+						}
+						realdata.put(row[0].toString(), temp);
+						coatest = 1;
+					}
+
+	                if(coatest == 0) {
+						// 전 계정을 조회함
+						
+						realdata.put(row[0].toString(), coas);
+					}
+				
+				}
+				
+				
+      				
+			}else {
+				realdata.put(coa.get(0), companywork.findmaxval(coa.get(0)));
+				
+			}
 			
 			
 		}
@@ -110,7 +149,7 @@ public class SearchController {
 		return ResponseEntity.status(HttpStatus.OK).body(realdata);
 	       
 	}    
-*/
+
 	
 	@PostMapping("/view/searcharray")
 	public ResponseEntity<Object> searcharray(HttpSession session, HttpServletRequest request){

@@ -20,7 +20,7 @@ import javax.persistence.Table;
 
 import org.springframework.stereotype.*;
 
-import java.util.HashSet;
+import java.util.*;
 import java.util.Set;
 
 import javax.inject.Inject;

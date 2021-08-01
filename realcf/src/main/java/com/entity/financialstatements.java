@@ -36,7 +36,7 @@ public class financialstatements {
 	 private int year;    // 사업보고서 연도
 
 	 
-	 @OneToMany(mappedBy = "financialstatements", cascade = CascadeType.ALL)
+	 @OneToMany(mappedBy = "financialstatements", cascade = CascadeType.ALL)  //, fetch = FetchType.EAGER
 	 private Set<coagroupdata> coagroupdata = new HashSet<>();
 	 
 	 public financialstatements() {

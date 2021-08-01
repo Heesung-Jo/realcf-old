@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -46,12 +47,12 @@ import com.entity.financialstatements;
 import com.repository.processrepository;
 import com.repository.teamrepository;
 import com.repository.RoleRepository;
-import com.repository.coagroupdataRepository;
+import com.repository.CoagroupdataRepository;
 import com.repository.memberrepository;
 import com.repository.CoadataRepository;
 import com.repository.CoadataRepositoryImpl;
 import com.repository.financialstatementsRepository;
-import com.repository.coagroupdataRepository;
+import com.repository.CoagroupdataRepository;
 import com.entity.Role;
 
 
@@ -78,7 +79,7 @@ public class companywork {
     private financialstatementsRepository financialstatementsRepository;
     
     @Autowired
-    private coagroupdataRepository coagroupdataRepository;
+    private CoagroupdataRepository coagroupdataRepository;
     
     
     @Autowired
@@ -90,6 +91,8 @@ public class companywork {
     @Autowired
     public void companywork() { 
            setting();
+           // 저장을 한 뒤에는 위에것은 // 처리하면 됨
+           setting2();
            
     } 
 	
@@ -115,12 +118,7 @@ public class companywork {
     	
     	// coaturnobj 시트 저장하기
     	// coaturnarr 만들기
-    	xlsubwork coa = new xlsubwork() {
-    		public void work(HSSFRow row) {
-    			coaturnarr.add(row.getCell(0).toString());
-    		}
-    	};
- 
+  
     	
     	xlsubwork coms = new xlsubwork() {
     		public void work(HSSFRow row) {
@@ -216,9 +214,7 @@ public class companywork {
     	
     	try {
     		xlmake.listmake("company", "datafordb_BS.xls", 0, 256, coms);
-    	
-    		xlmake.listmake("coaturn", "datafordb_BS.xls", 0, 90, coa);
-        	xlmake.listmake("data", "datafordb_BS.xls", 0, 100, sub); // 15619
+        	xlmake.listmake("data", "datafordb_BS.xls", 0, 500, sub); // 15619
     		
     	}catch(Exception e) {
             // 결국 이것은 파일이 없는 에러이므로 나중에
@@ -228,26 +224,55 @@ public class companywork {
     	
     	
     	
+    	
+    	
+    }
+ 
+    
+    public void setting2() {
     	// companyarr이 만들기
+       	xlsubwork coa = new xlsubwork() {
+    		public void work(HSSFRow row) {
+    			coaturnarr.add(row.getCell(0).toString());
+    		}
+    	};
+
+    	try {
+    		xlmake.listmake("coaturn", "datafordb_BS.xls", 0, 90, coa);
+     		
+    	}catch(Exception e) {
+            // 결국 이것은 파일이 없는 에러이므로 나중에
+    		// 다 throw fileexception으로 처리할 것
+    		System.out.println(e);
+    	}
+    	
     	for(financialstatements com : financialstatementsRepository.findAll()) {
     		companyarr.add(com.getname());
     	};
     	
-    	System.out.println(companyarr.size());
+    	// company에 자식들 채워넣기
+    	for(coagroupdata tempcoa : coagroupdataRepository.findAll()) {
+    		System.out.println(tempcoa.getcompany());
+    		financialstatements statements = financialstatementsRepository.findByname(tempcoa.getcompany());
+    		System.out.println(statements.getname());
+    		statements.addcoagroupdata(tempcoa);   	
+    		financialstatementsRepository.save(statements);
+    	}
     	
     }
     
-    public HashMap<String, JSONObject> toresponse(Set<coadata> coas){
+    
+    public HashMap<String, JSONObject> toresponse(Set<coagroupdata> coas){
     	
     	
     	HashMap<String, JSONObject> temp = new HashMap<>();
-    	for(coadata coa : coas) {
+    	for(coagroupdata coa : coas) {
     		
     		// 필요한 데이터 추출하여 json에 집어넣기
     		JSONObject json = new JSONObject();
     		json.put("name", coa.getname());
     		json.put("bspl", coa.getbspl());
-    		json.put("number", coa.getnumber());
+    		
     		json.put("val", coa.getval());
     		temp.put(coa.getname(), json);
     	}
@@ -258,12 +283,21 @@ public class companywork {
     
    public ArrayList<String> getcoaturnarr(){
 	   return coaturnarr;
+	   
    }
 
    public HashSet<String> getcompanyarr(){
 	   return companyarr;
    }
+   
+   public  List<Object[]> findmaxval(String name){
+	   return coagroupdataRepository.findmaxval(name);
 
+   }
+   public  List<Object[]> findmaxval(List<String> name){
+	   return coagroupdataRepository.findmaxval(name);
+
+   }
    
 }      
     

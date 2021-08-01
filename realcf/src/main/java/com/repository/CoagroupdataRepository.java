@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 
-public interface coagroupdataRepository extends JpaRepository<coagroupdata, Integer> {
+public interface CoagroupdataRepository extends JpaRepository<coagroupdata, Integer>, CoagroupdataRepositoryCustom {
 	coagroupdata findByname(String name);
 	coagroupdata findByCompanyAndLevelAndName(String company, double level, String name);
 } // The End...

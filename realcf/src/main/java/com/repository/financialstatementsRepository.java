@@ -18,8 +18,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface financialstatementsRepository extends JpaRepository<financialstatements, Integer> {
 
-	@Query("select m from financialstatements m join fetch m.coagroupdata where m.name = :name")
-	//@EntityGraph(attributePaths = {"coadata, coagroupdata"}, type = EntityGraph.EntityGraphType.LOAD)
-	financialstatements findByname(@Param("name") String name);  //
 	
+	@Query("select m from financialstatements m left join fetch m.coagroupdata where m.name = :name")
+	//@EntityGraph(attributePaths = {"coadata, coagroupdata"}, type = EntityGraph.EntityGraphType.LOAD)
+	financialstatements findByname(@Param("name") String name);  //@Param("name") 
+
 } // The End...
