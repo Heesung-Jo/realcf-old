@@ -108,6 +108,7 @@ public class mywork {
     	  @Override
       	  public void work(HSSFRow row) {
                 coahash.get(row.getCell(0).toString()).addlist(row.getCell(3).toString());
+                //System.out.println(coahash.get(row.getCell(0).toString()).getlist_sort().size());
       	  }
       	};
 
@@ -132,6 +133,7 @@ public class mywork {
         	listmake("계정과목_전체.xls", "세부분류", 0, 432, sub2);
         	listmake("계정과목_전체.xls", "중분류", 0, 120, sub3);
 
+        	coatest("건물");
 
     	}catch(Exception e) {
             System.out.println(e);    		
@@ -159,21 +161,18 @@ public class mywork {
 		 HashSet<String> array = new HashSet<String>();
 		 
 		 for(coaarray coa : coahash.values()) {
-			 
+			  
 			  for(String sort : coa.getlist_sort()) {
 				  Pattern p = Pattern.compile(sort);
 			      Matcher m = p.matcher((String) str);
 				  if(m.find()) {
-					  
 					 array.add(coa.getname());
+					 break;
 				  }
-				  
-				  break;
-				  
 			  }
 		 }
 
-		 System.out.println(array);
+		 
 		 // 포함여부 검증(손상차손, 손상차손누계액)일 때 무조건 손상차손누계액이 이겨야 함
 		 ArrayList<String> tem = new ArrayList<>();
          for(String word1 : array) {

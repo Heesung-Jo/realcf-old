@@ -89,7 +89,7 @@ var divisionmapping = {}
 var processteam = {}
 var subwin = {}
 
-
+var successtest = {0: [], 1: [], 2: [], 3: [], 4: []}
 
 
 class subcal{
@@ -98,21 +98,25 @@ class subcal{
 	// 210609 이제 계정 애매한 것을 처리하기 위해서 sub window 생성하는 코드 만들 것
 	// 그리고 손익만 있는 거래는 계산안하는 코드 집어넣을 것
 	
-    constructor(mainarr, num, prob, smallval){
+    constructor(mainarr, num, prob, smallval, sortedrealcoa){
         this.mainarr = mainarr;
         this.number = num;
+        this.successtestnum = 0 // 나중에 삭제해도 되는 것임
         
-        
+        this.makingcounter = 23; // 20개 정도를 초과하면 시간이 급수적으로 늘어남 // 그래도 재귀함수(배열.slice() 시간에서 많이 까먹음)보단 월등히 빠름
+
         this.typenumber = 0; // abc[1]의 숫자로 잘 분해되었는지에 대한 값을 저장함
                              // 0은 명확하게 나누어졌을때, 1은 확률카운터로 어느정도 명확할 때, 2는 afterfail 실행
         this.grouparr = [];
+        this.splitarr = []; // 나중에 차감계정과 메인계정을 잠시 분리해내기 위해서 만든 배열임
         this.probresult = [];
         
         this.testcount = 0;
         this.probmodel = prob;
         this.smallval = smallval;
+        this.valrelated = 0.6;
         this.deepnodeprob = 0;
-
+        this.sortedrealcoa = sortedrealcoa;
         // mainarr를 통해서 계정들 배열 만들기
         this.coaarray = new Set();
         for(var i in mainarr){
@@ -146,15 +150,21 @@ class subcal{
     
     execute = () => {
         
-    	if(this.execute_condition == "stop"){
-    		return
-    	}
-    	
+        if(this.execute_condition == "stop"){
+        	return;
+        }
+   	
         var abc = this.making(0, this.grouparr);
         var 임시=[]
         
         this.typenumber = abc[1];
-        
+       	if(this.number == 100016){
+       		console.log(this.grouparr.length)
+       		console.log(this.grouparr)
+    		console.log("comecome")
+    		console.log(abc)
+    	}
+       
         if(abc[1] > 1){
             
             // prob적으로 가까운 것 count만큼 모아서, making하는 함수
@@ -228,7 +238,7 @@ class subcal{
             	
                     if(차변 != 1 && 대변 != 1){
                     	// 결국 어느쪽 합계가 한쪽에서 커버되지 않으므로 분해가 불가능하므로 넘겨버릴 것
-                    	this.typenumber = 10;
+                     	this.typenumber = 10;
                     	return
                     }
 
@@ -239,9 +249,12 @@ class subcal{
             
             
             // 분해가 가능하므로 분해할 것
-            
+            var related = 0     //예를들어 {0, 1, 2} {3, 4}로 쪼개진 전표의 경우, 
+                                // 첫번째 set은 1, 두번째 set은 2로 구분을 주고
+                                // 이 구분자로 나중에 손익류 처리 등을 나누어서 처리할 수 있도록 함
+                           
             for(var i in abc2){
-                
+            	related += 1;
                 // maxval 결정하기
                 var maxval = 0;
                 var maxnum = 0;
@@ -260,31 +273,109 @@ class subcal{
                         var temp = JSON.parse(JSON.stringify(this.grouparr[i2]));
 
                         temp["상대계정"] = this.grouparr[maxnum]["계정과목"];
+                        temp["related"] = related
                         this.solvearr.push(temp);
 
                         // 큰쪽 값 쪼개서 집어넣기
                         var temp = JSON.parse(JSON.stringify(this.grouparr[maxnum]));
                         temp["상대계정"] = this.grouparr[i2]["계정과목"];
+                        temp["related"] = related
                         temp["금액"] = -1 * this.grouparr[i2]["금액"];
                         this.solvearr.push(temp);
 
                     }
                 }
-
-               
-
             }  
 
+            // 여기까지 오면 성공한 것임
+            // 리턴값을 줘서, 성공할때의 구별된 로직을 구현토록 하자(execute4에서)
+            this.execute_condition = "stop";
+            if(this.successtestnum == 0){
+                successtest[1].push(this.number);
+            }
+            return "success";
+            
           }
 
          
     }
+    
+    execute5(){
+        if(this.execute_condition == "stop"){
+        	return;
+        }
+    	
+    	this.solvearr = this.afterfail(this.grouparr, this.probmodel, this.smallval)
+    	this.typenumber = 2;
+    	successtest[4].push(this.number);
+    }
+    
 
-    execute2(){
+    execute4(){
+ 
+        if(this.execute_condition == "stop"){
+        	return;
+        }
+    	
+    	// 감누 1400 || 건물 2000
+    	// 현금 1000 || 처분손익 400
+    	// 이런것은 양빵 대응이 안되므로 포기하고 넘기게 됨
+    	// 이 경우 감누 1400 이랑 건물 1400은 일단 grouparr에서 빼버리고 
+        // execute를 실행함. 그 후 빼버린 것을 다시 합쳐줌
         
-    	if(this.execute_condition == "stop"){
-    		return
-    	}
+        // 일단 grouparr를 복제해두기 // 
+        var grouparr_temp =  JSON.parse(JSON.stringify(this.grouparr));
+        
+    	var existence = 0;
+        for(var i in this.grouparr){
+        	var coa = this.grouparr[i]['계정과목'];
+        	if('main' in this.sortedrealcoa[coa] == true){
+        		var main = this.sortedrealcoa[coa]['main'];
+        		for(var j in this.grouparr){
+        			
+        			if(this.grouparr[j]['계정과목'] == main){
+        				// 이 경우, 차감계정과 메인계정이 같이 있는 상태임
+        				// 차감계정을 0으로 만들면서 grouparr에서 빼주고, 그 숫자만큼 메인계정에서 더해줌
+        				// 그리고 splitarr에 빼버린 차감계정과 그리고 더해준 메인계정을 복제해서 만들고 그 것들을 집어넣어줌
+        			    existence = 1;
+        				this.grouparr[j]['금액'] += this.grouparr[i]['금액'];  
+        				var maincoa = JSON.parse(JSON.stringify(this.grouparr[j]));
+        				
+        				maincoa['금액'] = -1 * this.grouparr[i]['금액'];
+        				var minuscoa = this.grouparr.splice(i, 1)[0];
+        				minuscoa['상대계정'] = maincoa['계정과목'];
+        				maincoa['상대계정'] = minuscoa['계정과목'];
+        				
+        				this.splitarr.push(minuscoa);
+        				this.splitarr.push(maincoa);
+        				console.log(this.grouparr)
+        				
+        			}
+        		}
+        	}
+        }
+        
+        // 차감계정이 존재한 경우
+        if(existence == 1){
+        	this.successtestnum = 1
+        	var result = this.execute();
+        	if(result == "success"){
+        		this.solvearr = this.solvearr.concat(this.splitarr);
+        		this.execute_condition = "stop";
+                successtest[3].push(this.number);
+                
+        	}
+        }
+        
+        // grouparr 다시 복원시키기
+        this.grouparr = grouparr_temp;
+    
+    }
+    
+    execute2(){
+        if(this.execute_condition == "stop"){
+        	return;
+        }
     	
         if(this.typenumber > 0){
         	
@@ -296,10 +387,7 @@ class subcal{
 
             if(this.typenumber == 1){
                 var abc2 =  this.solvegroup;
-                // 이 아래도 분류가 잘 들어가도록 할 것
-                if(this.number == "100007"){
-                	
-                }
+                
 
                 for(var i in abc2){
                     // maxval 결정하기
@@ -332,14 +420,9 @@ class subcal{
                         }
                     }
                 }
-            	
-            	
-            }else if(this.typenumber > 1){
-
-            	
-            	this.solvearr = this.afterfail(this.grouparr, this.probmodel, this.smallval)
-            	this.typenumber = 2;
-            	
+                successtest[2].push(this.number);
+                this.execute_condition = "stop";
+                
             }
                   
         }
@@ -349,6 +432,9 @@ class subcal{
     
     // 3으로 표시되어 있으나, 이게 시작포인트임
     execute3(realcoa, 손익){
+        if(this.execute_condition == "stop"){
+        	return;
+        }
     	
        // 손익계정으로만 된 것은 더 이상 분해하지 않고, 종료시킴    	
     	for(var i in this.grouparr){
@@ -357,9 +443,114 @@ class subcal{
     			return
     		} 
     	}
-
-       this.execute_condition = "stop";
+        successtest[0].push(this.number);
+        this.execute_condition = "stop";
     }
+    
+    
+    
+    execute_incometype(realcoa , middlecoa){
+    	// 손익류 || 현금 처리를 다른 것으로 처리해야함
+    	
+    	
+    	for(var i in this.solvearr){
+    	    var coa = this.solvearr[i]["계정과목"];
+		    var relatedcoa = this.solvearr[i]["상대계정"];
+		    var relatedarr = this.find_relativeaccount(coa, i);
+		    var 분류2 = middlecoa[realcoa[coa]['분류2']]['분류2']
+		    var 분류2_relate = middlecoa[realcoa[relatedcoa]['분류2']]['분류2']
+		    
+    		if(realcoa[coa]["분류1"] == "현금흐름이 없는 손익" && 분류2_relate == "현금" ){
+    			// 이런 경우 상대계정이 현금류이면 해당계정과 가장 유사한 계정으로 바꿔치기 해줘야함
+                console.log("발생함");
+    			this.incometype_afterwork(i, {"현금": 0}, realcoa, middlecoa);
+    		}
+    		
+    		if(realcoa[coa]["분류1"] == "처분손익" && 
+    			(분류2_relate == "현금"  || 분류2_relate == "중간")){
+    			// 이런 경우 상대계정이 현금 또는 중간류이면 바꿔치기 해줘야함
+                console.log("발생함");
+    			this.incometype_afterwork(i, {"현금": 0, "중간": 0},realcoa,  middlecoa);
+    		}
+    	}
+    	
+    }
+    
+    incometype_afterwork(i, hash, realcoa, middlecoa){
+
+    	    var coa = this.solvearr[i]["계정과목"];
+		    var relatedcoa = this.solvearr[i]["상대계정"];
+		    var relatedarr = this.find_relativeaccount(coa, i);
+		    var 차변대변 = this.solvearr[i]["금액"] > 0 ? "차변" : "대변"
+		    var prob = 0;
+			var selection = ""; // 찾을 유사계정을 의미함
+			for(var j in this.solvearr){
+			 
+			  if(this.solvearr[i]['related'] == this.solvearr[j]['related'] && 
+					  middlecoa[realcoa[this.solvearr[j]['계정과목']]["분류2"]]["분류2"] in hash == false){
+  		    	var prob_temp = this.probcal(coa, this.solvearr[j]['계정과목'], 차변대변);
+  		    	console.log(this.probmodel)
+		        if(prob_temp > prob){
+		        	prob = prob_temp;
+		        	
+		        	selection = this.solvearr[j]['계정과목'];
+		        }
+				  
+			  }	
+			}
+			
+			// 유사계정을 못찾은 경우 전체 prob에서 가장 큰 값으로 선택해야 함
+			
+			if(selection == ""){
+				for(var i in this.probmodel[coa][차변대변]){
+					var val = 0;
+					if(i != "total"){
+						var val_temp = this.probmodel[coa][차변대변][i];
+						if(val_temp > val){
+							val = val_temp;
+							selection = i;
+						}
+					}
+				}
+				
+			}
+			console.log(selection)
+			
+			// 새전표생성 두개(유사계정 + -) 생성해서 solvearr에 집어넣기
+			
+			var similar1 = JSON.parse(JSON.stringify(relatedarr));
+			console.log("relatedarr:" + similar1["계정과목"] + "^" + similar1["상대계정"])
+			similar1["계정과목"] = selection
+			var similar2 = JSON.parse(JSON.stringify(this.solvearr[i]));
+			console.log("realarr:" + similar2["계정과목"] + "^" + similar2["상대계정"])
+			similar2["계정과목"] = selection
+			
+			this.solvearr.push(similar1);
+			this.solvearr.push(similar2);
+			
+			// 상대계정 유사계정으로 바꾸기 두개
+			relatedarr['상대계정'] = selection;
+			this.solvearr[i]['상대계정'] = selection;    	
+    }
+    
+    find_relativeaccount(arr, i){
+
+    	var coa = this.solvearr[i]["계정과목"];
+    	var related = this.solvearr[i]["related"];
+    	var relative = this.solvearr[i]["상대계정"];
+    	
+    	for(var j in this.solvearr){
+    		if(this.solvearr[j]['계정과목'] == relative && this.solvearr[j]['related'] == related){
+    			if(this.solvearr[j]['금액'] == -1 * this.solvearr[i]['금액']){
+                    console.log("있는데");
+    				return this.solvearr[j];
+    				
+    			}
+    		}
+    		
+    	}
+    }
+    
     
     coagrouping(){
     	// 계정번호 같은 것을 그룹핑하기 위해서 만들었음
@@ -386,7 +577,7 @@ class subcal{
         		// 전표번호 및 계정과목
         		arr[계정과목]["계정과목"] = 계정과목
         		arr[계정과목]["전표번호"] = this.mainarr[i]["전표번호"];
-        		
+        		arr[계정과목]["related"] = 0;
         		// 나중에 비고 반영할 것
         		
         		
@@ -488,7 +679,7 @@ class subcal{
          prob = b in this.probmodel[a]['차변'] ? this.probmodel[a]['차변'][b]/this.probmodel[a]['차변']["total"] : this.smallval;
       }else if(opt == "대변"){
          prob = b in this.probmodel[a]['대변'] ? this.probmodel[a]['대변'][b]/this.probmodel[a]['대변']["total"] : this.smallval;
-      }else if(opt == "종합"){
+      }else{
          var 차변 = b in this.probmodel[a]['차변'] ? this.probmodel[a]['차변'][b]/this.probmodel[a]['차변']["total"] : this.smallval;
          var 대변 = b in this.probmodel[a]['대변'] ? this.probmodel[a]['대변'][b]/this.probmodel[a]['대변']["total"] : this.smallval;
          prob = (차변 + 대변)/(this.probmodel[a]['차변']["total"] + this.probmodel[a]['대변']["total"]);
@@ -701,7 +892,7 @@ class subcal{
 */
 
     
-
+    
     var ab = [];
     var cd = [];
     var abcd = [];
@@ -720,14 +911,24 @@ class subcal{
         for(var j in cd){
             if(cd[j][1] in prob[ab[i][1]]['차변']){
                 var val1 = prob[ab[i][1]]['차변'][cd[j][1]]/prob[ab[i][1]]['차변']['total']
+            	
+            	// 만약에 차감형 계정이라면 관련 거래가 없었어도 이건 충분히 확률을 높여줘야함
+                val1 = this.cal_relatedcoa(ab[i][1], cd[j][1], val1)            	
             }else{
                 var val1=valsmall
+                val1 = this.cal_relatedcoa(ab[i][1], cd[j][1], val1)            	
+ 
             }
 
             if(ab[i][1] in prob[cd[j][1]]['대변']){
                 var val2=prob[cd[j][1]]['대변'][ab[i][1]]/prob[cd[j][1]]['대변']['total']
+                val2 = this.cal_relatedcoa(ab[i][1], cd[j][1], val2)            	
+
+            
             }else{
                 var val2=valsmall
+                val2 = this.cal_relatedcoa(ab[i][1], cd[j][1], val2)            	
+
             }
             var val = Math.max(val1,val2)
             test.push(val)
@@ -766,6 +967,7 @@ class subcal{
                     if(i1 != i2 && j1 != j2){
                         val1 = arrprob[i1][j1]+arrprob[i2][j2]
                         val2 = arrprob[i2][j1]+arrprob[i1][j2]
+                        
                         if(val1 > val2){
                             var val3 = Math.min(coavalue[i2][j1],coavalue[i1][j2])
                             coavalue[i1][j1]=coavalue[i1][j1]+val3
@@ -790,8 +992,9 @@ class subcal{
     for(var i1 = 0; i1 < ab.length; i1++){
         for(var j1 = 0; j1 < cd.length; j1++){
             if(coavalue[i1][j1] > 0){
-                realarr.push({전표번호: this.number*1, 금액: coavalue[i1][j1],계정과목: ab[i1][1], 상대계정: cd[j1][1], ref: ab[i1][2]})
-                realarr.push({전표번호: this.number*1, 금액: -coavalue[i1][j1],계정과목: cd[j1][1], 상대계정: ab[i1][1], ref: cd[j1][2]})
+                realarr.push({전표번호: this.number*1, 금액: Math.round(coavalue[i1][j1]),계정과목: ab[i1][1], 상대계정: cd[j1][1], ref: ab[i1][2]})
+                realarr.push({전표번호: this.number*1, 금액: -Math.round(coavalue[i1][j1]),계정과목: cd[j1][1], 상대계정: ab[i1][1], ref: cd[j1][2]})
+                
             }
         }
     }
@@ -803,7 +1006,27 @@ class subcal{
 
 
 
-
+   cal_relatedcoa(coa1, coa2, val){
+	 
+	   // 실제 prob의 확률과 다르게, 임의로 확률수치르 보정함
+	   // 사건이 발생하지 않아서 그렇지, 자산과 그에 대한 차감계정은 높은 확률 관계가 있는 것이므로
+	 if(coa1 in this.sortedrealcoa){  
+     	if('main' in this.sortedrealcoa[coa1]){
+    	    if(this.sortedrealcoa[coa1]['main'] == coa2){
+	            return Math.max(val, this.valrelated)	
+    	    }
+	    }
+	 }
+	 if(coa2 in this.sortedrealcoa){  
+	     	if('main' in this.sortedrealcoa[coa2]){
+	    	    if(this.sortedrealcoa[coa2]['main'] == coa1){
+		            return Math.max(val, this.valrelated)	
+	    	    }
+		    }
+		 }
+	 
+	 return val
+   }
 
 
 
@@ -898,8 +1121,43 @@ class subcal{
         
     return arr
   }
+  
+  
 
     //^^ 거래를 쪼개는 함수들
+  
+    
+  making_func(arr){
+  	
+      var time = new Date().getTime()
+       this.realcount = 0
+		for(var i = 0; i < arr.length; i++){
+  		this.making_repeat(arr, [], i, 0)
+  	}
+  	
+      var time = new Date().getTime()
+ 
+  }
+  
+  making_repeat(arr, temp, count, num){
+     
+  	for(var i = num; i < arr.length; i++){
+  		if(temp.length < count){
+  			var im= temp.slice();
+  			im.push(i)
+  			this.making_repeat(arr, im, count, i + 1);
+  		}
+  	}
+  	
+  	if(temp.length == count){
+      	//console.log(temp);
+  		this.realcount += 1
+  	}
+  	
+		
+  }
+    
+    
     making = (s1, arr) => {
 
        var 합=[0]
@@ -915,9 +1173,9 @@ class subcal{
        var 실패=0
        var 지속=0
        
-                합계[0]=s1
-       if(arr.length > 25){
-                          실패 = 20    //실패를 20은 숫자초과로 행렬곱으로 계산해야하는 것들
+       합계[0]=s1
+       if(arr.length > this.makingcounter){
+            실패 = 20    //실패를 20은 숫자초과로 행렬곱으로 계산해야하는 것들
                       // 10은 나머지인데 확률카운터로 한번 더 걸러냄
                       // 손익만 있는 거래는 이것을 하지 않음
         }
@@ -931,48 +1189,36 @@ class subcal{
             // 아래 같다로 바꾸어도 문제없음
             if(합계[0] < 합[0]+ 1 && 합계[0] > 합[0] - 1){
                 im[i] = ii
+                
                 // alert succeed
 
                 var imcopy = new Set(im);
                 result.push(imcopy)
-                
-                
-                
-                var ars = this.erase(result.slice())
+                 var ars = this.erase(result.slice())
                 ars = this.failsure(ars,arr)
                 result = ars[1].slice()
                 
                 // if fail then, 실패 ==1
                 if(ars[0] == 1){
-
-                                            실패 = 10
+                	console.log("실패임")
+                    실패 = 10
                     break
                 }
             }
 
-            var 마이너스 = 0
-            //[[13], [-5], [24], [-8], [21]]
 
-            for(var iii = ii + 1; iii < n; iii++){
-                //console.log(arr[iii]);
-                if(arr[iii]["금액"] < 0){
-                                         마이너스 = arr[iii]["금액"] + 마이너스
-                }
-            }                
-            
-            // 아래도 -0.3 빼고 <=로 바꿔도 문제없음         
-            if(합[0] + 마이너스 - 0.3 < 합계[0]){
-                
                 if(ii == n-1){
+                	
                     im.splice(i, 1)
-
+                    
                     i = i - 1
                     if(i < 0){
-                                                     실패 = 10
+                        실패 = 11
                         break
                      }
 
                     im[i] = im[i] + 1
+                    
                     if(i > 0){
                         합1[0] = 0
                         for(var kk = 0; kk < i; kk++){
@@ -982,38 +1228,21 @@ class subcal{
                     }else{
                         합1[0]=0
                     }
-
                     break
                 }else{
                     im[i] = ii
+                    
                     i=i+1
                     im.push(ii + 1)
+                    
+
                     합1[0]=합[0]
                     break
                 }
-            }
-                   
-            if(ii == n-1){
-                im.splice(i, 1)
-                i = i-1
-                if(i < 0){
-                                            실패=10
-                    break
-                }
-                    
-                im[i]=im[i]+1
-                if(i > 0){
-                    합1[0]=0
-                    for(var kk = 0; kk < i; kk++){
-                        합1[0]=합1[0] + arr[im[kk]]["금액"]
-                    }
-                }else{
-                    합1[0]=0
-                    break
-                }
-             }    
-         } // 첫번째 for 문 닫기
 
+            
+         } // 첫번째 for 문 닫기
+         
          if(실패 >= 1){
            break
          } 
@@ -1045,13 +1274,18 @@ class subcal{
        var 지속=0
        
        합계[0]=s1
+       if(arr.length > this.makingcounter){
+           실패 = 20    //실패를 20은 숫자초과로 행렬곱으로 계산해야하는 것들
+                     // 10은 나머지인데 확률카운터로 한번 더 걸러냄
+                     // 손익만 있는 거래는 이것을 하지 않음
+       }
 
     while(im[0] < n-1){
 
         for(var ii = im[i]; ii < n; ii++){
             합[0] = 합1[0] + arr[ii]["금액"]
             지속 = 지속 + 1
-           
+          
             // 아래 같다로 바꾸어도 문제없음
             if(합계[0] < 합[0]+ 1 && 합계[0] > 합[0] - 1){
                 im[i] = ii
@@ -1061,18 +1295,11 @@ class subcal{
                 
             }
 
-            var 마이너스 = 0
             //[[13], [-5], [24], [-8], [21]]
 
-            for(var iii = ii + 1; iii < n; iii++){
-                //console.log(arr[iii]);
-                if(arr[iii]["금액"] < 0){
-                                         마이너스 = arr[iii]["금액"] + 마이너스
-                }
-            }                
-            
+             
             // 아래도 -0.3 빼고 <=로 바꿔도 문제없음         
-            if(합[0] + 마이너스 - 0.3 < 합계[0]){
+          
                 
                 if(ii == n-1){
                     im.splice(i, 1)
@@ -1109,27 +1336,9 @@ class subcal{
                     합1[0]=합[0]
                     break
                 }
-            }
+           
                    
-            if(ii == n-1){
-                im.splice(i, 1)
-                i = i-1
-                if(i < 0){
-                    실패=1
-                    break
-                }
-                    
-                im[i]=im[i]+1
-                if(i > 0){
-                    합1[0]=0
-                    for(var kk = 0; kk < i; kk++){
-                        합1[0]=합1[0] + arr[im[kk]]["금액"]
-                    }
-                }else{
-                    합1[0]=0
-                    break
-                }
-             }    
+    
          } // 첫번째 for 문 닫기
 
 
@@ -1158,10 +1367,11 @@ class subcal{
        var 지속 = 0
        
        합계[0] = s1
-       if(arr.length > 21){
-           실패 = 1    //실패를 1로 하면 순수하게 나눠진 것만 볼 수 있음
-                      // 2로하면 행렬곱으로 다 쪼개는데, 정확성은 확실히 떨어지네
-        }
+       if(arr.length > this.makingcounter){
+           실패 = 20    //실패를 20은 숫자초과로 행렬곱으로 계산해야하는 것들
+                     // 10은 나머지인데 확률카운터로 한번 더 걸러냄
+                     // 손익만 있는 거래는 이것을 하지 않음
+       }
 
     while(im[0] < n-1){
 
@@ -1245,18 +1455,7 @@ class subcal{
 
             }
 
-            var 마이너스 = 0
-            //[[13], [-5], [24], [-8], [21]]
-
-            for(var iii = ii + 1; iii < n; iii++){
-                //console.log(arr[iii]);
-                if(arr[iii]["금액"] < 0){
-                                          마이너스 = arr[iii]["금액"] + 마이너스
-                }
-            }                
-            
-            // 아래도 -0.3 빼고 <=로 바꿔도 문제없음         
-            if(합[0] + 마이너스 - 0.3 < 합계[0]){
+ 
                 
                 if(ii == n-1){
                     im.splice(i, 1);
@@ -1291,27 +1490,9 @@ class subcal{
                     합1[0]=합[0]
                     break
                 }
-            }
+            
                    
-            if(ii == n-1){
-                im.splice(i, 1);
-                i = i-1
-                if(i < 0){
-                    실패=1
-                    break
-                }
-                    
-                im[i]=im[i]+1
-                if(i > 0){
-                    합1[0]=0
-                    for(var kk = 0; kk < i; kk++){
-                        합1[0]=합1[0] + arr[im[kk]]["금액"]
-                    }
-                }else{
-                    합1[0]=0
-                    break
-                }
-             }    
+    
          } // 첫번째 for 문 닫기
 
          if(실패 >= 1){
@@ -1543,6 +1724,9 @@ class showing{
 	//
 	//
 	//
+
+    
+
 	
 	ajaxmethod(link, data, act){
 		
@@ -1636,37 +1820,61 @@ class showing{
         // 내용열 만들기
     	var tbody = document.createElement("tbody");
     	this.maintag.appendChild(tbody);
-        
-        
-      for(var i of this.realcoa){
+      
+    	
+    	// 보여줄 계정들 순서 정렬하기
+    	console.log(this.sortedrealcoa);
+    	
+    	var turn = []
+        for(var i of this.realcoa){
     	  
-         if(this.sortedrealcoa[i]["분류1"] == "BS" ||
-        		 this.sortedrealcoa[i]["분류1"] == "자산/부채에 차감하는 계정" ){
-        	
-    	    this.settlementarr[i] = {}
-    	    console.log(i)
-    		var subsum = this.cal_subsum2(i);
-        	console.log(subsum)
-    	    var subdiv = this.maketrtd(this.settlementarr[i], 6);
+           if(this.sortedrealcoa[i]["분류1"] == "BS"){
+        	   turn.push(i);
+        	   
+           }
+         }
+    	
+        for(var i of this.realcoa){
+      	  
+            if(this.sortedrealcoa[i]["분류1"] == "자산/부채에 차감하는 계정" ){
+         	   //주계정의 위치찾기
+         	   var main = this.sortedrealcoa[i]['main'];
+         	   for(var j = 0; j < turn.length; j++){
+         		   if(turn[j] == main){
+         			   turn.splice(j + 1, 0, i)
+         			   break
+         		   }
+         	   }
+            }
+    	
+        }
+
+    	
+    	// 이제 집어넣기
+        
+      for(var i in turn){
+    	  
+    	    this.settlementarr[turn[i]] = {}
+    		var subsum = this.cal_subsum2(turn[i]);
+    	    var subdiv = this.maketrtd(this.settlementarr[turn[i]], 6);
     	    tbody.appendChild(subdiv)
     	   
-     		this.settlementarr[i][0].innerText = i;
-    	    this.settlementarr[i][1].innerText = this.comma(subsum["손익"].sum);
-    	    this.settlementarr[i][2].innerText = this.comma(subsum["영업"].sum);
-    	    this.settlementarr[i][3].innerText = this.comma(subsum["투자"].sum);
-    	    this.settlementarr[i][4].innerText = this.comma(subsum["재무"].sum);
-    	    this.settlementarr[i][5].innerText = this.comma(subsum["대체"].sum);
+     		this.settlementarr[turn[i]][0].innerText = turn[i];
+    	    this.settlementarr[turn[i]][1].innerText = this.comma(subsum["손익"].sum);
+    	    this.settlementarr[turn[i]][2].innerText = this.comma(subsum["영업"].sum);
+    	    this.settlementarr[turn[i]][3].innerText = this.comma(subsum["투자"].sum);
+    	    this.settlementarr[turn[i]][4].innerText = this.comma(subsum["재무"].sum);
+    	    this.settlementarr[turn[i]][5].innerText = this.comma(subsum["대체"].sum);
 
     	    for(var num = 1; num <= 5; num++){
     			var field = document.createElement("input");
     			field.setAttribute("type", "checkbox");
-    	        this.settlementarr[i][num].appendChild(field)
-    	    	this.settlementarr[i][num].style = "text-align: right;"
-    	    	this.additem4(field, i, subsum[temp[num].innerText].arr);
+    	        this.settlementarr[turn[i]][num].appendChild(field)
+    	    	this.settlementarr[turn[i]][num].style = "text-align: right;"
+    	    	this.additem4(field, turn[i], subsum[temp[num].innerText].arr);
     	    }
 
-    		this.beforecoa = i;
-         }
+    		this.beforecoa = turn[i];
        }
         // 우측 상세내역 볼 테이블
     	var div = document.createElement("div")
@@ -2327,7 +2535,7 @@ class showing{
          prob = b in this.probmodel[a]['차변'] ? this.probmodel[a]['차변'][b]/this.probmodel[a]['차변']["total"] : this.smallval;
       }else if(opt == "대변"){
          prob = b in this.probmodel[a]['대변'] ? this.probmodel[a]['대변'][b]/this.probmodel[a]['대변']["total"] : this.smallval;
-      }else if(opt == "종합"){
+      }else{
          var 차변 = b in this.probmodel[a]['차변'] ? this.probmodel[a]['차변'][b] : 0;
          var 대변 = b in this.probmodel[a]['대변'] ? this.probmodel[a]['대변'][b] : 0;
          prob = (차변 + 대변)/(this.probmodel[a]['차변']["total"] + this.probmodel[a]['대변']["total"]);
@@ -2445,6 +2653,7 @@ class showing{
             this.subclass[i].execute2()
             
         }
+    	
         
     }
 
@@ -2456,11 +2665,32 @@ class showing{
         }
     	
     }
+
+    execute4(){
+        for(var i in this.subclass){
+            this.subclass[i].execute4();
+            
+        }
+    }
     
+    execute5(){
+            for(var i in this.subclass){
+                this.subclass[i].execute5();
+                
+            }
+            
+            console.log(successtest)
+    }
     
    //
    
-
+    execute_incometype(){
+        for(var i in this.subclass){
+            this.subclass[i].execute_incometype(this.sortedrealcoa, this.middlecoa);
+            
+        }
+    	
+    }
    
     
    // 정산표 배열에 집어넣기(coasum)
@@ -2608,7 +2838,8 @@ class showing{
                return
            }else{
                // 전표별로 subclass 만들기
-        	   this.subclass[i] = new subcal(this.subsumarr[i].arr, i, this.probmodel, this.smallval);
+        	   this.subclass[i] = new subcal(this.subsumarr[i].arr, i, this.probmodel, this.smallval, this.sortedrealcoa);
+               
            } 
        }
        
@@ -2828,31 +3059,37 @@ function hashdatafromexcel(wb, hash, sheet, opt, arr){ // arr는 있다면 사�
 
 }
 
-function arraydatafromexcel(arr){
-    
-}
-
 
 window.onload = function(){
+	
+      //real(1, arr, 0, arr[0])
       
-      var aaaa = [9,7,2]
-      var bbbb = [12,3]
+      var tem = {"현금": 0, "중간": 0}
+      console.log("개똥" in tem)
       
- 
-      aaaa.shift(2)
-
-      
+      var temp = {}
       
       table = new showing();
       table.maketable();
       table.makelabel();
       table.makeitemselect();
 
-      var abc = new subcal();
+      var arr =[]
+      for(var i = 0; i < 23; i++){
+    	  arr.push(i)
+      }
       var time = new Date().getTime()
+      console.log(time);
       
-      //abc.making(0, [[13], [-5], [24], [-8], [100], [83], [-21], [-3]])
-      var temp = [{금액: 13}, {금액: -5}, {금액: -8}, {금액: -7}, {금액: 7}, {금액: -37}, {금액: 37}];
+      //table.making_func(arr)
+      //table.making_test(0, arr)
+      
+      var abc = new subcal();
+      
+      var val = abc.making3(0, [{금액: 13}, {금액: -5}, {금액: -3}, {금액: -10}], [])
+      console.log(val)
+      var temp = [{금액: 6000000}, {금액: -10000000}, {금액:4000000}];
+      var temp2 = [{금액: -6000000}, {금액: 10000000}, {금액:-4000000}];
 
       //var temp = [{금액: 13}, {금액: -5}, {금액: -3}, {금액: -10}, {금액: 24}, {금액: -8}, {금액: 100}, {금액: -83}, {금액: -21}, {금액: -7}];
       for(var i = 0; i < 1; i++){
@@ -2860,7 +3097,8 @@ window.onload = function(){
       }
 
       //var ar = abc.making(0, temp)
-      console.log((new Date().getTime() - time)/1000)
+      //var ar = abc.making(0, temp2)
+      console.log(arr)
       //abc.erase([new Set([0, 1]), new Set([0,1,2,3])])
 
       

@@ -349,16 +349,29 @@ select {
            // 210619 여기에 table 코드 집어넣을 것
            opener.table.makeprob();
 	       opener.table.execute3();
-           
 	       opener.table.execute();
-           
+         
            opener.table.execute2();
+           opener.table.execute4();
+           opener.table.execute5();
+           opener.table.execute_incometype();
            
            opener.table.inputcoasum();
            
            opener.table.makesettlement();
            
 	       window.close();
+	   }
+	   
+
+	   execute_func(arr_func){
+		   for(var i in arr_func){
+			   if(opener.table.execute_condition != "stop"){
+			       arr_func[i]();
+			   }else{
+				   break
+			   }
+		   }
 	   }
 	   
 	   examtest(i){

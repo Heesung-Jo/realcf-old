@@ -61,7 +61,6 @@ public class HelloController {
 		ArrayList<String> paras = new ArrayList<>();
  
 		System.out.println(realcoa);
-		
 		JSONArray arr = new JSONArray();
 		JSONObject realarr = new JSONObject();
 		
