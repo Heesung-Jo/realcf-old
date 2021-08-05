@@ -32,11 +32,9 @@ public class member implements Principal, Serializable {
     private String email;
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     
 
@@ -47,6 +45,15 @@ public class member implements Principal, Serializable {
      *
      * @return
      */
+    
+    public void setRole(Role role) {
+    	this.role = role;
+    }
+    
+    public String getRoleKey() {
+        return this.role.getKey();
+    }
+    
     public String getEmail() {
         return email;
     }
@@ -101,12 +108,7 @@ public class member implements Principal, Serializable {
      * Get the list of Roles for this CalendarUser
      * @return
      */
-    public Set<Role> getRoles() {
-        return roles;
-    }
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
+ 
 
 
 

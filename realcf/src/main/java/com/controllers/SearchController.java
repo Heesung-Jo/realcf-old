@@ -63,6 +63,7 @@ public class SearchController {
 			@RequestParam(value="coa[]") @Nullable List<String> coa,
 			@RequestParam(value="company[]") @Nullable List<String> company) {
 	
+		
 
 		HashMap<String, Object> realdata = new LinkedHashMap<>();
 		// 로직: company가 있을때는 무조건 company로 조회

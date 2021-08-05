@@ -27,6 +27,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @SpringBootApplication(scanBasePackages={
         
         "com.config",
+        "com.auth",
         "com.controllers",
         "com.entity",
         "com.repository",

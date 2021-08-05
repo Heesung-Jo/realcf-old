@@ -11,10 +11,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import com.repository.memberdao;
-import com.repository.RoleRepository;
-
-import com.entity.member;
 import com.entity.Role;
+import com.entity.member;
+
 
 /**
  * A default implementation of {@link memberService} that delegates to {@link EventDao} and {@link memberdao}.
@@ -35,15 +34,13 @@ public class DefaultmemberService implements memberService {
     @Autowired
     private memberrepository userRepository;
 
-    @Autowired
-    private RoleRepository rolerepository;
-
+ 
     
     @Autowired
     public DefaultmemberService(
                                   memberdao userDao,
-                                  memberrepository userRepository,
-                                  RoleRepository rolerepository
+                                  memberrepository userRepository
+                                  
                                   //final PasswordEncoder passwordEncoder
                                   ) {
         if (userDao == null) {
@@ -59,12 +56,9 @@ public class DefaultmemberService implements memberService {
         */
         
         this.userDao = userDao;
-        this.rolerepository = rolerepository;
 
 		// role 세팅
-		Role role = new Role();
-		role.setName("ROLE_USER");
-		rolerepository.save(role);
+		Role role = Role.USER;
 		
 		// 기본 아이디 세팅
 		
@@ -72,7 +66,7 @@ public class DefaultmemberService implements memberService {
         user.setEmail("gochoking@naver.com");
         user.setname("jo hee sung");
         user.setPassword("{noop}12341234");
-
+        user.setRole(role);
      //   logger.info("CalendarUser: {}", user);
 
         System.out.println("여기가 문제니");

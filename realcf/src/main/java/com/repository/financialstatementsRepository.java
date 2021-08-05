@@ -1,6 +1,6 @@
 package com.repository;
 
-import com.entity.Role;
+
 import com.entity.processdata;
 import com.entity.coadata;
 import com.entity.financialstatements;

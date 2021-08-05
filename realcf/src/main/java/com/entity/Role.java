@@ -9,40 +9,26 @@ import java.util.Set;
  *
  * @author Mick Knutson
  */
-@Entity
-@Table(name = "role")
-public class Role  implements Serializable {
+public enum Role {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-    private String name;
+	   GUSET("ROLE_GUEST", "손님"),
+	   USER("ROLE_USER", "일반 사용자");
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "roles")
-    private Set<member> users;
+	   private final String key;
+	   private final String title;
+	   
+	   Role(String key, String title) {
+	        this.key = key;
+	        this.title = title;
+	    }
 
-    public Integer getId() {
-        return id;
-    }
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<member> getUsers() {
-        return users;
-    }
-    public void setUsers(Set<member> users) {
-        this.users = users;
-    }
+	    public String getKey() {
+	        return this.key;
+	    }
 
 
-  
-
-} // The End...
+	    public String gettitle() {
+	        return this.title;
+	    }	   
+	   
+	} // The End...

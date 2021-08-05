@@ -46,14 +46,14 @@ import com.entity.financialstatements;
 
 import com.repository.processrepository;
 import com.repository.teamrepository;
-import com.repository.RoleRepository;
+
 import com.repository.CoagroupdataRepository;
 import com.repository.memberrepository;
 import com.repository.CoadataRepository;
 import com.repository.CoadataRepositoryImpl;
 import com.repository.financialstatementsRepository;
 import com.repository.CoagroupdataRepository;
-import com.entity.Role;
+
 
 
 import java.io.File;
@@ -214,7 +214,7 @@ public class companywork {
     	
     	try {
     		xlmake.listmake("company", "datafordb_BS.xls", 0, 256, coms);
-        	xlmake.listmake("data", "datafordb_BS.xls", 0, 500, sub); // 15619
+        	xlmake.listmake("data", "datafordb_BS.xls", 0, 200, sub); // 15619
     		
     	}catch(Exception e) {
             // 결국 이것은 파일이 없는 에러이므로 나중에

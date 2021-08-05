@@ -32,7 +32,8 @@ spring:
     hibernate:
       ddl-auto: update #create #update #create-drop  
 
-
+  main:
+    allow-bean-definition-overriding: true
 
 
 

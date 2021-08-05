@@ -8,7 +8,8 @@ import javax.servlet.http.HttpSession;
 
 import java.net.*;
 import java.io.*;
-
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -20,7 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ModelAttribute;
-
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.auth.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +39,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.service.memberService;
 
 import com.entity.member;
-import com.service.UserContext;
+//import com.service.UserContext;
 
 import com.model.SignupForm;
 
@@ -55,7 +57,7 @@ import com.entity.teamdata;
 import com.service.mywork;
 import com.service.companywork;
 import com.service.coaarray;
-
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 @Controller
 @RequestMapping
 public class LoginController {
@@ -68,12 +70,15 @@ public class LoginController {
 	@Autowired
 	private mywork mywork;
 	
+	
+	
 	@Autowired
 	private companywork companywork;
-	
 
+	
     private final UserContext userContext;
-    private final memberService memberService;
+
+	private final memberService memberService;
 	
 	/*
     private AuthService authService;
@@ -84,7 +89,8 @@ public class LoginController {
    */
 
     @Autowired
-    public LoginController(UserContext userContext, memberService memberService) {
+    public LoginController(memberService memberService, UserContext userContext
+    		) {
         if (userContext == null) {
             throw new IllegalArgumentException("userContext cannot be null");
         }
@@ -93,6 +99,7 @@ public class LoginController {
         }
         this.userContext = userContext;
         this.memberService = memberService;
+        
     }
 
 
@@ -138,8 +145,13 @@ public class LoginController {
 
     
     @GetMapping("/view/second")
-    public String second(Model model) {
+    public String second(Model model, HttpSession httpSession) {
     	System.out.println("why why why");
+    	OAuth2User user = (OAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	System.out.println(user.getAttributes().get("email"));
+    	System.out.println("why why why");
+ 
+    	
       return "search";
     }
     @GetMapping("/view/search")
@@ -153,6 +165,7 @@ public class LoginController {
     
     @GetMapping("/view/home")
     public String home(Model model) {
+    	
       return "start";
     }
 
@@ -160,7 +173,7 @@ public class LoginController {
     public String explanation(Model mav) {
 
     	System.out.println(8989898);
-    	
+    	SecurityContextHolder.getContext().setAuthentication(null);
     	
     	/* 데이터마이닝 위하여 파이썬 플라스크를 사용할 계획이었고, 이렇게 테스트 하였을 때 성공하였음
     	      다만, 데이터마이닝 유효성이 그렇게 높지 않아서, 삭제함
@@ -330,8 +343,9 @@ public class LoginController {
     
     
     @RequestMapping("/view/loginSuccess")
-    public String submit2(Model model) {
-    	
+    public String submit2(Model model, OAuth2AuthenticationToken authentication) {
+        System.out.println("authentication = " + authentication);
+        
         
     	return "loginsuccess";
     }
@@ -371,7 +385,7 @@ public class LoginController {
         System.out.println("여기가 문제니");
         int id = memberservice.createUser(user);
         user.setId(id);
-        userContext.setCurrentUser(user);
+      //  userContext.setCurrentUser(user);
         System.out.println("아니면 여기니");
         redirectAttributes.addFlashAttribute("message", "You have successfully signed up and logged in.");
         return "redirect:/view/Scoping";

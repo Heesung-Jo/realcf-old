@@ -1,9 +1,11 @@
 package com.repository;
 
-import com.entity.member;
+
 import com.entity.Role;
+import com.entity.member;
+
 import com.repository.memberrepository;
-import com.repository.RoleRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,31 +35,25 @@ public class Jpamemberdao implements memberdao {
     // --- members ---
     @Autowired
     private memberrepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
 
     // --- constructors ---
 
     @Autowired
-    public Jpamemberdao(final memberrepository repository,
-                              final RoleRepository roleRepository) {
+    public Jpamemberdao(final memberrepository repository
+                              ) {
         if (repository == null) {
             throw new IllegalArgumentException("repository cannot be null");
         }
-        if (roleRepository == null) {
-            throw new IllegalArgumentException("roleRepository cannot be null");
-        }
 
         this.userRepository = repository;
-        this.roleRepository = roleRepository;
     }
 
     // --- CalendarUserDao methods ---
-
+    
    // @Override
     @Transactional(readOnly = true)
     public member getUser(final int id) {
-    	
+
         return userRepository.getOne(id);
     }
 
@@ -98,11 +94,9 @@ public class Jpamemberdao implements memberdao {
             throw new IllegalArgumentException("userToAdd.getId() must be null when creating a "+member.class.getName());
         }
 
-        Set<Role> roles = new HashSet<>();
-        Role role = roleRepository.getOne(1);
-        System.out.println(role.getName());
-        roles.add(role);
-        userToAdd.setRoles(roles);
+        
+        Role role = Role.USER;
+        userToAdd.setRole(role);
 
         member result = userRepository.save(userToAdd);
         

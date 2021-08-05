@@ -1,6 +1,6 @@
 package com.repository;
 
-import com.entity.Role;
+
 import com.entity.processdata;
 
 import java.util.List;
@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+/*
 @Repository
 public class RoleRepository {
 
@@ -19,7 +20,7 @@ public class RoleRepository {
     EntityManager em;
 
     @Transactional
-    public void save(Role pro) {
+    public void save(Role3 pro) {
     	
     	if (pro.getId() == null) {
 	    	em.persist(pro);
@@ -28,15 +29,16 @@ public class RoleRepository {
 	    }
     }
     
-    public Role findByEmail(String name) {
-        return em.createQuery("select m from Role m where m.email = :name", Role.class)
+    public Role3 findByEmail(String name) {
+        return em.createQuery("select m from Role m where m.email = :name", Role3.class)
                 .setParameter("name", name)
                 .getResultList().get(0);
     }
 
-    public Role getOne(int id) {
-    	return em.find(Role.class, id);
+    public Role3 getOne(int id) {
+    	return em.find(Role3.class, id);
     }
 	
 	
 } // The End...
+*/
