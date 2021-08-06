@@ -7,9 +7,9 @@
 <%@ page session="false" %>
 
             <form id="search" method = "post" action = "">
-                
+              <div id = "contentitem"> 
                 </br>
-                <div>
+                <div >
                     <span>업종 선택</span>
                     <span id = "business" class = "listmanage"></span>
                     <span>
@@ -36,14 +36,19 @@
                 </div>
                 
                 </br>
-                <div>
-                    <input type ="button" id = "submitbutton" value = "제출하기" style = "width: 300px"/>
+                <div style = "left: 300px">
+                    <input type ="button" id = "submitbutton" value = "제출하기" style = "width: 500px;"/>
                 </div>
             
                 </br>
-                <div id = 'tablediv'>
-                </div>
                 
+              </div>
+              
+              <div id = "tableitem"> 
+                  <div id = 'tablediv'>
+                  </div>
+              </div>
+                             
             </form>
             
             
@@ -56,6 +61,17 @@ span {
     font-weight: bold;
     
 }
+
+#contentitem {
+    position: relative;
+    width: 1050px;
+    margin: 20px 0 5px 120px;
+    padding: 20px 0 5px 28px;
+    border: 1px solid black; 
+    background: #f7f9fa;
+ }
+
+
 
 .listmanage{
   height: 20px;
@@ -93,7 +109,7 @@ span {
 
 
 table {
-    border: 1px solid #444444;
+    border: 1px solid black;
     border-collapse: collapse;
     
   }
@@ -113,11 +129,21 @@ table td {
 }
 
 
-select {
-      width: 100%;
-      height: 100%;
-      border: 0px;
+#tableitem {
+    position: relative;
+    width: 1080px;
+    margin: 20px 0 5px 120px;
+    border: 1px solid black; 
+    background: #f7f9fa;
+ }
+
+
+#tablediv {
+   align-items: center;
+   justify-content: center;
 }
+
+
 
 
 

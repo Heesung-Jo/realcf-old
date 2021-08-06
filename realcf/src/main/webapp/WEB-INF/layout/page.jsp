@@ -48,26 +48,42 @@
     </style>
     <!-- ì½íì¸  -->
     <style>
-        #wrap { overflow: hidden; }
+        #wrap { 
+            overflow: hidden; 
+            margin: 0 auto;
+            position: relative;
+            }
         #wrap > #main_lnb { 
             float: left;
             width: 200px;
+            height: 100%;
+            
+            
         }
         #wrap > #content_wrap {
             float: left;
-            width: 100%;
-            *width: 99.9%;
-            margin-right: -200px;
+            left: 200px;
+            height: 100%;
+            width: 1200px;
+            background: white;
+            position: absolute;
+            margin: 0 auto;
         }
-        #wrap > #content_wrap > #content { padding-right: 200px; }
+
     </style>
     <style>
-        #wrap { background: #71B1D1; }
+        #wrap {  }
+        #main_lnb {
+            height: 95%;
+            background: #71B1D1;
+            
+            }
         #main_lnb > ul > li > a {
             display: block;
             height:40px; line-height: 40px;
             padding-left: 15px;
-
+            
+            
             border-top: 1px solid #96D6F6;
             border-bottom: 1px solid #6298B2;
             color: white;
@@ -77,7 +93,7 @@
     <style>
         #content {
             background: white;
-            border-left: 1px solid black;
+            
         }
         article { padding: 10px; }
     </style>
@@ -88,13 +104,11 @@
             border-top: 3px solid black;
             text-align: center;
         }
-        
-
 
  
   * {
        margin: 0; padding: 0;
-       font: normal 12px 'Dotum';
+       
    }
   a { text-decoration: none; }
   img { border: 0; }
@@ -105,7 +119,15 @@
     margin: 0 auto; 
   }
         
-        
+table select {
+      width: 100%;
+      height: 100%;
+      border: 0px;
+}    
+
+  
+
+    
     </style>
 </head>
 
@@ -115,11 +137,11 @@
 
 
     <div id="wrap">
-        <nav id="main_lnb">
+        <div id="main_lnb">
             <ul>
                <t:insertAttribute name="menu" />  
             </ul>
-         </nav>
+         </div>
        <div id="content_wrap">
             <t:insertAttribute name="body" />
        </div>

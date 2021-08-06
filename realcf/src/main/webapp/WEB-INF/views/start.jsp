@@ -12,9 +12,27 @@
 <style>
 
 
+#content_right { 
+  float: left;
+  width: 20%;
+  background: white;
+  
+   margin: 20px 0 5px 20px;
+}
+
+#tablediv {
+  float: left;
+  width : 70%;
+  border-right: 1px solid #5F6673;
+  background: #f7f9fa;
+  height: 100%;
+  
+}
+	
 table.maintable {
     border: 1px solid #444444;
     border-collapse: collapse;
+    width: 100%;   
   }
   
 table.maintable th {
@@ -26,8 +44,14 @@ table.maintable th {
 
 table.maintable td {
     border: 1px solid #444444;
-    background: white
+    background: white;
+    height: 25px;
   }
+  
+table.maintable select {
+
+background: pink;
+}
 
 table.settlement {
   border-collapse: collapse;
@@ -46,7 +70,7 @@ table.settlement thead th {
   background: #dcdcd1;
 }
 table.settlement tbody th {
-  width: 700px;
+ 
   padding: 5px;
   font-weight: bold;
   vertical-align: top;
@@ -55,15 +79,13 @@ table.settlement tbody th {
   background: #ececec;
 }
 table.settlement td {
-  width: 700px;
+  
   padding: 5px;
   vertical-align: top;
   border-right: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
   background: white
 }
-
-
 
 
 
@@ -2131,7 +2153,7 @@ class showing{
 
     	this.tablediv.appendChild(this.selectsheet)             // div로 바꾸고
      	this.table.setAttribute("border", "10");
-     	this.table.setAttribute("width", "100%");
+     	//this.table.setAttribute("width", "100%");
      	this.table.setAttribute("class", "maintable");
     	                         //밑의 함수는 ~~~div2
                                                    //가 아닌 ~~~div로
@@ -3540,6 +3562,16 @@ class makecoa{
 
 <body>
 
+<span id ="tablediv" ></span>
+
+<span id = "content_right">
 <input type="file" id="excelFile" onchange="excelExport(event)"/>
-<div id ="tablediv" ></div>
+<input type="button" id= "exampletest" value ="예제 시뮬레이션"/>
+
+</span>
+
 </body>
+
+
+
+
