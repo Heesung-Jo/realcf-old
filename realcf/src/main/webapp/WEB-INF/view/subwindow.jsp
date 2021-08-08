@@ -94,7 +94,7 @@ select {
 	 	   
 	 	   for(var i in opener.table.sortedcoa){
 	 		  // 손익류 , 차감형 등 집어넣기  
-	      
+	          console.log(i)
 	 		  var sorting = opener.table.middlecoa[opener.table.coasortobj[opener.table.coasort(i)]]["분류2"];
 	 		  // 210622 이자류가 별도로 엑셀파일에 집계 안되었을 수도 있으니, 추후 집계할 것
 	 		  if(sorting == "처분류" || sorting == "손익류" || sorting == "이자류"){
@@ -140,10 +140,10 @@ select {
 	 	   // 추가적으로 만들어야하는 것은 갑자기 bs계정이라 생각했는데 차감형을 선택하면 위치를 차감형쪽으로 올리도록 수정
 	 	   // 그리고 최종적으로 클릭하면 sortedcoa가 아니라,
 	 	   // sortedconcoa로 확정할 것
-		 	   
+		 console.log(opener.table.sortedcoa)
 	 	   for(var i in opener.table.sortedcoa){
 	 		  // 손익류 , 차감형 등 집어넣기  
-	          
+	          console.log(i)
 	 		  
 	 		  var sorting = opener.table.middlecoa[opener.table.coasortobj[opener.table.coasort(i)]]["분류2"];
 	 		  // 210622 이자류가 별도로 엑셀파일에 집계 안되었을 수도 있으니, 추후 집계할 것

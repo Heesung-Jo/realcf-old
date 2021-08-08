@@ -147,9 +147,10 @@ public class LoginController {
     @GetMapping("/view/second")
     public String second(Model model, HttpSession httpSession) {
     	System.out.println("why why why");
-    	OAuth2User user = (OAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    	System.out.println(user.getAttributes().get("email"));
-    	System.out.println("why why why");
+    	member member = userContext.getCurrentUser();
+    	
+    	System.out.println(member.getEmail());
+    	System.out.println(member.getname());
  
     	
       return "search";

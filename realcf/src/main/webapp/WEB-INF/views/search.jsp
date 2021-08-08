@@ -37,7 +37,7 @@
                 
                 </br>
                 <div style = "left: 300px">
-                    <input type ="button" id = "submitbutton" value = "제출하기" style = "width: 500px;"/>
+                    <input type ="button" id = "submitbutton" value = "제출하기"/>
                 </div>
             
                 </br>
@@ -108,8 +108,13 @@ span {
 }
 
 
+#submitbutton {
+
+  width: 995px;
+}
+
+
 table {
-    border: 1px solid black;
     border-collapse: collapse;
     
   }
@@ -130,11 +135,12 @@ table td {
 
 
 #tableitem {
-    position: relative;
+    
     width: 1080px;
     margin: 20px 0 5px 120px;
     border: 1px solid black; 
     background: #f7f9fa;
+    border-collapse: collapse;
  }
 
 
@@ -403,6 +409,7 @@ class showing{
 	    	   count = 3
 	       }
 
+	       
 	       var subdiv = this.maketrtd(temp, count, "th");
 	       temp[0].innerText = "계정명"
 	       temp[1].innerText = "계정종류"
@@ -426,8 +433,8 @@ class showing{
 	       temptable.appendChild(tbody);
 	       
 	       // 테이블 갯수 최소가 20개이고 배열이 더 많으면 그 이상 만들기
-	       var temcount = arr ? Object.keys(arr).length : 0;
-           var count = Math.max(20, temcount);	       
+	      // var temcount = arr ? Object.keys(arr).length : 0;
+          // var count = Math.max(20, temcount);	       
            
    		   
            if(arr){

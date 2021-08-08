@@ -91,7 +91,7 @@ public class Jpamemberdao implements memberdao {
             throw new IllegalArgumentException("userToAdd cannot be null");
         }
         if (userToAdd.getId() != null) {
-            throw new IllegalArgumentException("userToAdd.getId() must be null when creating a "+member.class.getName());
+            //throw new IllegalArgumentException("userToAdd.getId() must be null when creating a "+member.class.getName());
         }
 
         

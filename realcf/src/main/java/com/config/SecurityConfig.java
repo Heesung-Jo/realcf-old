@@ -1,6 +1,6 @@
 package com.config;
 
-
+import com.service.memberService;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -66,12 +66,15 @@ import com.service.memberService;
 import com.entity.Role;
 import com.entity.member;
 import com.repository.memberdao;
-import com.service.CustomOAuth2UserService;
+import com.userdetail.CustomOAuth2UserService;
 import javax.servlet.http.HttpSession;
 /**
  * Spring Security Config Class
  * @see WebSecurityConfigurerAdapter
  */
+
+
+
 @Configuration
 @EnableWebSecurity//(debug = true) //@EnableGlobalMethodSecurity(securedEnabled=true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -79,8 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Logger logger = LoggerFactory
             .getLogger(SecurityConfig.class);
 
-    @Autowired
-    private HttpSession httpSession;
+    
     /**
      * Configure AuthenticationManager with inMemory credentials.
      *
@@ -212,6 +214,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
     private OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
         final OidcUserService delegate = new OidcUserService();
+        
 
         return (userRequest) -> {
             // Delegate to the default implementation for loading a user
@@ -224,10 +227,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             System.out.println("success");
             Map<String, Object> attributes = oidcUser.getAttributes();
+        
+            member member_find = memberdao.findUserByEmail((String) attributes.get("email"));
             member member = new member();
+            
+            if(member_find == null) {
+                member = new member();
+            	
+            }else {
+            	member = member_find;
+            }
+            
+            
             member.setEmail((String) attributes.get("email"));
             member.setname((String) attributes.get("name"));
             member.setRole(Role.USER);
+            
+            
+            
             int mem = memberdao.createUser(member);
             System.out.println("success4");
             // TODO

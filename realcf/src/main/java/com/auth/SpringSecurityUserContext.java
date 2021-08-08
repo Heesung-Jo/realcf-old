@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import com.service.memberService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 /**
  * An implementation of {@link UserContext} that looks up the {@link member} using the Spring Security's
@@ -52,11 +53,12 @@ public class SpringSecurityUserContext implements UserContext {
             return null;
         }
 
-        member user = (member)authentication.getPrincipal();
-        String email = user.getEmail();
+        OAuth2User user = (OAuth2User)authentication.getPrincipal();
+        String email = (String) user.getAttributes().get("email");
         if (email == null) {
             return null;
         }
+        
         member result = memberService.findUserByEmail(email);
         if (result == null) {
             throw new IllegalStateException(

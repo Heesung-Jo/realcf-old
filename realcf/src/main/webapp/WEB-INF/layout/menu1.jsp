@@ -8,6 +8,4 @@
 
 
                 <li><a href="start">원장입력</a></li>
-                <li><a href="myshowing">자신의 업무보기</a></li>
-                <li><a href="gojs9">플로우차트</a></li>
                 <li><a href="explanation">이해하기</a></li>

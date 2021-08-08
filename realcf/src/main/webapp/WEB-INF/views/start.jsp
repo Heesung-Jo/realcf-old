@@ -14,31 +14,50 @@
 
 #content_right { 
   float: left;
-  width: 20%;
   background: white;
-  
-   margin: 20px 0 5px 20px;
+  margin: 20px 0 5px 20px;
+  overflow: hidden;
+  width: 23%;
 }
+
+#content_right > div { 
+  overflow: hidden;
+  height: 50px;
+}
+
+#content_right > div > input, select { 
+  float: left;
+  height: 28px;
+  border: 1px solid black;
+  padding: 0px;
+}
+
+
+
+
 
 #tablediv {
   float: left;
-  width : 70%;
+  width : 75%;
   border-right: 1px solid #5F6673;
   background: #f7f9fa;
-  height: 100%;
+  height: 93%;
+  overflow: scroll;
   
 }
 	
 table.maintable {
     border: 1px solid #444444;
     border-collapse: collapse;
-    width: 100%;   
+    width: 2000px;
+   
   }
   
 table.maintable th {
   border: 1px solid #444444;
   font-weight: bold;
   background: #dcdcd1;
+  width: 100px;
 
   }
 
@@ -46,11 +65,12 @@ table.maintable td {
     border: 1px solid #444444;
     background: white;
     height: 25px;
+    width: 100px;
   }
   
 table.maintable select {
 
-background: pink;
+  background: pink;
 }
 
 table.settlement {
@@ -58,6 +78,7 @@ table.settlement {
   text-align: left;
   line-height: 1.5;
   border-left: 1px solid #ccc;
+  width: 100%;
   
 }
 
@@ -172,6 +193,7 @@ class subcal{
     
     execute = () => {
         
+    	
         if(this.execute_condition == "stop"){
         	return;
         }
@@ -328,6 +350,8 @@ class subcal{
         }
     	
     	this.solvearr = this.afterfail(this.grouparr, this.probmodel, this.smallval)
+    	console.log(this.grouparr);
+    	console.log(this.solvearr);
     	this.typenumber = 2;
     	successtest[4].push(this.number);
     }
@@ -601,7 +625,7 @@ class subcal{
         		arr[계정과목]["전표번호"] = this.mainarr[i]["전표번호"];
         		arr[계정과목]["related"] = 0;
         		// 나중에 비고 반영할 것
-        		
+        		arr[계정과목]["셜명"] = this.mainarr[i]["설명"];
         		
         	}
 
@@ -1673,6 +1697,8 @@ class showing{
 	// sorting_sortedrealcoa라는 함수를 아래에 만듬. 거기가서 수정할 것은 수정할 것
     
     constructor(obj){
+    	
+    	this.func_turn_arr = [];
         // 처음 원장 받는 view와 관련된 것
         this.coasetarr = {}  // 서버에서 넘어올 것이고  
                              // {"차변": ["차변"], "대변": ["대변"], "합계": ["합계","잔액"], "계정과목": ["계정과목", "계정명"], "전표번호": ["전표번호"]}
@@ -1685,14 +1711,17 @@ class showing{
 
         
         this.tablediv = document.getElementById("tablediv");
+        this.content_right = document.getElementById("content_right");
+
         this.selectsheet = {};  // wb(엑셀파일)에서 선택된 시트를 의미함
+
         this.testbutton = {};   // 원장분석을 시작하기 위한 버튼
         
         // 여기까지가 처음뷰 관련
         this.selectlabel = {}; // 행시작열에 달려있는 label들임
         this.itemselect = {};  // 행시작행에 달려있는 select
         this.itemarray = {};   // {제목행 : 1, 전표번호 : 3 ... 등의 오브젝트}
-        this.tablesize = {width : 11, height : 11}; 
+        this.tablesize = {width : 20, height : 50}; 
         this.realis = {};
         this.realcoa = new Set([]);  // coa 배열임
         this.realcoaobj = {};        // coa 관련 object
@@ -1737,11 +1766,32 @@ class showing{
 		        "BS": "BS", "일반": "일반", "IS": "IS"}
         this.중분류_손익 = {"현금흐름이 없는 손익":"현금흐름이 없는 손익", "처분손익": "처분손익", 
 		        "이자손익": "이자손익", "IS": "IS"}
+        console.log(this.tablediv)
+        this.func_turn_arr = [this.maketable, this.makelabel, this.makeitemselect];
+        this.func_turn_act(0);
+       
+        
         
         
 	}
 
 	
+    
+    // 연속 함수 실행
+    
+    func_turn_act(count){
+    	
+    	console.log(count)
+    	if(count < this.func_turn_arr.length - 1){
+    		var real = count + 1;
+        	this.func_turn_arr[count](() => {this.func_turn_act(real)});
+    	}else if(count = this.func_turn_arr.length - 1){
+    		this.func_turn_arr[count]();
+    	}
+    	
+    }
+    
+    
 	//^^ 아작스 관련
 	//
 	//
@@ -1799,6 +1849,9 @@ class showing{
         this.table.parentNode.removeChild(this.table);
         this.selectsheet.parentNode.removeChild(this.selectsheet);
         this.testbutton.parentNode.removeChild(this.testbutton);
+        this.tablediv.style.width = "100%";
+        this.content_right.parentNode.removeChild(this.content_right);
+        
 
         // 구조를 좌측, 오른쪽, 아래쪽 세 구도를 잡기위해서
         // tablediv에 upperdiv를 만들고 집어넣고, upperdiv에는 좌측 ,오른쪽을 집어넣고, float: left함
@@ -1818,7 +1871,7 @@ class showing{
     	tableup.appendChild(table);
     	this.maintag = table;
         
-        tableup.style = "float: left; overflow: scroll; width: 700px;  height: 400px; border: 1px solid #444444;"
+        tableup.style = "float: left; overflow: scroll; width: 70%;  height: 500px; border: 1px solid #444444;"
         // 계정과목별로 펼치기
         // 210518 이것도 이제 손익, 영업, 투자, 재무로 쪼개서 보여줄 것
         // 구조 계정과목, 손익, 숫자, 영업, 숫자, 투자, 숫자, 재무, 숫자, 대체, 숫자 총 11개
@@ -1850,7 +1903,7 @@ class showing{
     	var turn = []
         for(var i of this.realcoa){
     	  
-           if(this.sortedrealcoa[i]["분류1"] == "BS"){
+           if(this.sortedrealcoa[i]["분류1"] == "BS" && this.sortedrealcoa[i]["분류2"] != "현금및현금성자산"){
         	   turn.push(i);
         	   
            }
@@ -1903,14 +1956,14 @@ class showing{
     	upperdiv.appendChild(div)
     	this.righttag = div;
      
-    	div.style = "float: left; overflow: scroll; width: 300px;  height: 400px; border: 1px solid black;"
+    	div.style = "float: left; overflow: scroll; width: 28%;  height: 500px; border: 1px solid black;"
         
         // 아래쪽 테이블 전표번호별 수정가능한 테이블 만들기
         // 210408 수정되는 기능 추가해야함. 드랍다운 기능 추가해야함
         var div = document.createElement("div")
         this.tablediv.appendChild(div)
         this.bottomtag = div;
-        div.style = "overflow: scroll; width: 1005px;  height: 150px; border: 1px solid black;"
+        div.style = "overflow: scroll; width: 100%;  height: 300px; border: 1px solid black;"
 
         
     }
@@ -1957,20 +2010,34 @@ class showing{
     
     cal_subsum2 = (coa) => {
     	
+    	console.log(this.sortedrealcoa)
+    	console.log(this.middlecoa)
+    	
         var sum = {"손익": {sum: 0, arr: new Set([])}, "영업": {sum: 0, arr: new Set([])}, "투자": {sum: 0, arr: new Set([])}, "재무": {sum: 0, arr: new Set([])}, "대체": {sum: 0, arr: new Set([])}};
-        console.log(this.coasum[coa])
         for(var i in this.coasum[coa]){
         	
            // 이건 과거코드였음 var sortcoa = this.middlecoa[this.coasortobj[this.coasort(i)]]["분류3"]
            // 이제 계정 선택을 sortedrealcoa로 했기때문에 그것으로 선택하도록 할 것
            if(this.sortedrealcoa[i]["분류1"] == "현금흐름이 없는 손익" ||
         		   this.sortedrealcoa[i]["분류1"] == "처분손익" ||
-        		   this.sortedrealcoa[i]["분류1"] == "이자손익"){
+        		           this.sortedrealcoa[i]["분류1"] == "이자손익"){
         	   var sortcoa = "손익"
            }else{
-        	   sortcoa = "영업" // 210709 sortedrealcoa에 나중에는 투자 대체계정까지 나누어지도록 분류를 더 추가할 것
+        	   
+        	   var tem = this.sortedrealcoa[coa]["분류2"];
+        	   var 주계정 = this.middlecoa[tem]['분류3']
+        	   var 계정 = this.sortedrealcoa[i]["분류2"];
+        	   var 분류2 = this.middlecoa[계정]['분류2']
+        	  
+        	   if(분류2 == "중간" || 분류2 == "현금"){
+        		   sortcoa = 주계정
+        	   }else{
+        		   sortcoa = "대체"
+        	   }
+        	   
            }
-           
+           console.log(주계정)
+           console.log(sortcoa)
            sum[sortcoa]["sum"] += this.coasum[coa][i]["sum"];
            sum[sortcoa]["arr"].add(i);
         }
@@ -2138,31 +2205,31 @@ class showing{
     }
 
     //^^ viex에 관한 함수
-    maketable(){
+    maketable = (func) => {
     	this.table = document.createElement("table"); // div 가 나은것 같으면
     	
+    	console.log(this.tablediv)
     	
     	this.tablediv.appendChild(this.table); 
-    	this.selectsheet = document.createElement("select");
-    	this.testbutton = document.createElement("input");
-    	this.testbutton.setAttribute('type', "button");
-    	this.testbutton.value = "테스트하기"
+    	this.selectsheet = document.getElementById("selectsheet");
+    	this.testbutton = document.getElementById("testbutton");
         this.additem3(this.testbutton);
 
-    	this.tablediv.appendChild(this.testbutton)   
+        this.selectsheet.addEventListener('change',()=>{this.fromexcel(this.wb, this.selectsheet.value)});
 
-    	this.tablediv.appendChild(this.selectsheet)             // div로 바꾸고
-     	this.table.setAttribute("border", "10");
-     	//this.table.setAttribute("width", "100%");
-     	this.table.setAttribute("class", "maintable");
+      	this.table.setAttribute("class", "maintable");
     	                         //밑의 함수는 ~~~div2
                                                    //가 아닌 ~~~div로
         // processlist 반영하기 
     	for(var i = 0; i < this.tablesize.height;i++){
     	    this.tablearr[i] = {}
-    	    var subdiv = this.maketrtd(this.tablearr[i], this.tablesize.width);
+    	    var subdiv = this.maketrtd(this.tablearr[i], this.tablesize.width, null, {"width": "100px"});
      		this.table.appendChild(subdiv)
     	}
+    	     
+    	if(func){
+        	func()
+    	}                         
 
     }
     
@@ -2196,10 +2263,10 @@ class showing{
     
 
     
-    makelabel = () => {
+    makelabel = (func) => {
 
         this.tablearr[0][0].innerText = "행시작"
-        for(var i = 1; i <= 10; i++){
+        for(var i = 1; i < this.tablesize.height; i++){
            // 라디오 버튼을 테이브 앞단에 둬, 제목열 선택할 수 있게할 것
            this.selectlabel[i] = document.createElement("input")
            this.selectlabel[i].setAttribute('type', "radio");
@@ -2208,6 +2275,9 @@ class showing{
            this.additem2(this.selectlabel[i], i);
 
            this.tablearr[i][0].appendChild(this.selectlabel[i])   
+        }
+        if(func){
+            func()
         }
     }
 
@@ -2431,7 +2501,9 @@ class showing{
             
             
             // 여기까지 통과했으면 이제 합계가 0이 뜨는지 확인하기
-            this.excelsum();
+            if(this.excelsum() != "success"){
+            	return;
+            }
            
             // 이제 전표번호별로 합계가 일치하는지 확인할 것
             const promise = new Promise((resolve) => {
@@ -2458,8 +2530,8 @@ class showing{
 
         
     // select 만드는 함수 등    
-    makeitemselect = () => {
-        for(var i = 1; i < 10; i++){
+    makeitemselect = (func) => {
+        for(var i = 1; i < this.tablesize.width; i++){
 
            // 라디오 버튼을 테이브 앞단에 둬, 제목열 선택할 수 있게할 것
            
@@ -2491,24 +2563,33 @@ class showing{
            opt.innerText = "전표번호";
            this.itemselect[i].appendChild(opt);
 
+           var opt = document.createElement('option');
+           opt.innerText = "설명";
+           this.itemselect[i].appendChild(opt);
            
            // 이벤트 함수 집어넣기
            this.additem1(this.itemselect[i], i);  
  
            // 옵션 집어넣기
            this.tablearr[0][i].appendChild(this.itemselect[i])   
-           
+           console.log(this.tablearr[0][i]);
         }
+        
+        if(func){
+        	func()
+        }
+        
 
     }
 
-    makeselect = (arr) => {
+    makeselectsheet = (arr) => {
         
 
-        this.selectsheet.parentNode.removeChild(this.selectsheet); 
-        this.selectsheet = document.createElement("select");
-        this.tablediv.appendChild(this.selectsheet)   
-        this.selectsheet.addEventListener('change',()=>{this.fromexcel(this.wb, this.selectsheet.value)});
+        for(var k = this.selectsheet.childNodes.length - 1; k > 1; k--){
+        	this.selectsheet.removeChild(item.parentNode.childNodes[k]); 
+        }
+        
+        
         
         for(var i in arr){
             var opt = document.createElement('option');
@@ -2516,6 +2597,7 @@ class showing{
             opt.innerText = arr[i];
             this.selectsheet.appendChild(opt)
         }
+        
         return this.selectsheet;
     }  
     
@@ -2795,7 +2877,7 @@ class showing{
        var sum = 0;
        
        for(var r = this.itemarray["제목행"]; r <= range.r; r++){
-               if(!Number(this.wb.Sheets[this.sheetname][XLSX.utils.encode_cell({r: r, c: this.itemarray["합계"]-1})].v)){
+               if(!Number(this.excelposfind("합계",r))){
                    alert("숫자가 아닌 데이터가 있습니다. 확인해 주세요")
                    return
                };
@@ -2806,9 +2888,25 @@ class showing{
           alert("차변 대변 합계가 0이 아닙니다. 확인해 주세요");
           return   
        }
+       
+       return "success";
     } 
 
+    
+    excelposfind(text, r){
+    	
+    	if(XLSX.utils.encode_cell({r: r, c: this.itemarray[text]-1}) in this.wb.Sheets[this.sheetname] == true){
+        	if("v" in this.wb.Sheets[this.sheetname][XLSX.utils.encode_cell({r: r, c: this.itemarray[text]-1})] == true){
+        		return this.wb.Sheets[this.sheetname][XLSX.utils.encode_cell({r: r, c: this.itemarray[text]-1})].v
+        	}
+    		
+    	}
+    	
+    	return "";
+    }
+    
     async excelsubsum(resolve){
+    	console.log(this.itemarray)
         // 여기에서 전표번호별 합계를 체크하고 맞으면 최종적으로 전표별로 sub class를 만들기
        
        var total = this.wb.Sheets[this.sheetname]["!ref"]
@@ -2820,16 +2918,17 @@ class showing{
        
        for(var r = this.itemarray["제목행"]; r <= range.r; r++){
                
-               var 계정과목 = this.wb.Sheets[this.sheetname][XLSX.utils.encode_cell({r: r, c: this.itemarray["계정과목"]-1})].v
+               var 계정과목 = this.excelposfind("계정과목", r)
                
                this.realcoa.add(계정과목);
                
 
           // 전표의 집어넣을 배열만들기
           var subarr = {
-                            전표번호 : this.wb.Sheets[this.sheetname][XLSX.utils.encode_cell({r: r, c: this.itemarray["전표번호"]-1})].v,
-                            계정과목 : this.wb.Sheets[this.sheetname][XLSX.utils.encode_cell({r: r, c: this.itemarray["계정과목"]-1})].v,
-                            금액 : this.wb.Sheets[this.sheetname][XLSX.utils.encode_cell({r: r, c: this.itemarray["합계"]-1})].v,
+                            전표번호 : this.excelposfind("전표번호", r),
+                            계정과목 : this.excelposfind("계정과목", r),
+                            금액 : this.excelposfind("합계", r),
+                            설명 : this.excelposfind("설명", r)
           }
 
                // 계정과목별로 probmodel setting 하기
@@ -2853,6 +2952,7 @@ class showing{
       }           
 
        // subsumarr 점검하고 subclass 만들기 
+       console.log(this.subsumarr);
        
        for(var i in this.subsumarr){
            if(this.subsumarr[i].sum != 0){
@@ -2954,7 +3054,7 @@ class showing{
 
          var row = 1;
 
-         this.coasetarr = {"차변": ["차변"], "대변": ["대변"], "합계": ["합계","잔액"], "계정과목": ["계정과목", "계정명"], "전표번호": ["전표번호"]}
+         this.coasetarr = {"차변": ["차변"], "대변": ["대변"], "합계": ["합계","잔액"], "계정과목": ["계정과목", "계정명"], "전표번호": ["전표번호"], "설명": ["설명"]}
          // 210518 향후에는 coamapping 하는 것처럼 
          // 정규식 이런 것 사용해서 정확성 올릴 것           
          
@@ -2991,10 +3091,9 @@ class showing{
        var start = total.indexOf(":");
        var lastcell = total.substring(start + 1, 10);
        var range = XLSX.utils.decode_cell(lastcell);
-           
-       
-       var rowval = Math.min(range.r+1, this.tablesize.height - 1);
-       var colval = Math.min(range.c+1, this.tablesize.width - 1);
+
+       var rowval = this.tablesize.height - 1 //Math.min(range.r+1, this.tablesize.height - 1);
+       var colval = this.tablesize.width - 1  //Math.min(range.c+1, this.tablesize.width - 1);
       
        
        for(var r = 1; r <= rowval; r++){
@@ -3003,10 +3102,9 @@ class showing{
               try{
             	 var tem = this.comma(wb.Sheets[sheet][XLSX.utils.encode_cell({r: r-1, c: c-1})].v)
                  this.tablearr[r][c].innerText = tem
-                 
                  this.tablearr[r][c].style = this.numbertag(tem, "")
               }catch{
-                // this.tablearr[r][c].innerText = 0;
+                 this.tablearr[r][c].innerText = "";
               }
 
           }
@@ -3092,10 +3190,8 @@ window.onload = function(){
       var temp = {}
       
       table = new showing();
-      table.maketable();
-      table.makelabel();
-      table.makeitemselect();
-
+      
+      
       var arr =[]
       for(var i = 0; i < 23; i++){
     	  arr.push(i)
@@ -3138,7 +3234,7 @@ function excelExport(event){
         // coaarray 읽어드려서 만들기
         table.wb = wb;
         table.fromexcel(wb);
-        table.makeselect(wb.SheetNames);
+        table.makeselectsheet(wb.SheetNames);
 
         // row를 2로 임의로 배정했으나, 앞으로 이것도 자동 추가해야함
         
@@ -3562,13 +3658,34 @@ class makecoa{
 
 <body>
 
-<span id ="tablediv" ></span>
+<div id ="tablediv" ></div>
 
-<span id = "content_right">
+
+
+<div id = "content_right">
+
+<h3>원장이 있는 파일선택</h3>
+
+<div> 
 <input type="file" id="excelFile" onchange="excelExport(event)"/>
-<input type="button" id= "exampletest" value ="예제 시뮬레이션"/>
+</div>
 
-</span>
+<h3>시트선택 및 실행</h3>
+
+<div> 
+<input type="button" id ="testbutton" value="실행하기" style = "width: 75px;"/>
+<select id = "selectsheet" style = "width: 173px;"></select>
+</div>
+
+
+<h3>샘플로 테스트하기</h3>
+
+<div>
+<input type="button" id= "exampletest" value ="샘플테스트" style = "width: 75px;"/>
+<select id = "selectsample" style = "width: 173px;"></select>
+</div>
+
+</div>
 
 </body>
 
