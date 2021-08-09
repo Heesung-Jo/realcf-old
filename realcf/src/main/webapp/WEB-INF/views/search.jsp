@@ -52,7 +52,16 @@
             </form>
             
             
+            <div id = 'subtablediv'>
+                <table id ='subtable'></table>
+            </div>
+            
 <style>
+
+
+#subtable tr:hover th {
+   background: yellow;
+}
 
 span {
     display: inline-block;
@@ -169,7 +178,9 @@ class showing{
 	  this.business = document.getElementById("business");  
 	  this.company = document.getElementById("company");    
 	  this.coa = document.getElementById("coa");           
-
+      this.subtablediv = document.getElementById("subtablediv");
+      this.subtable = document.getElementById("subtable"); // div 가 나은것 같으면
+      this.subtablearr = {};
 	  
 	  // 회사선택, 계정선택 등을 위한 구성화면과 그에 따른 리스너
 	  this.businessarr = []; // 서버에서 받아올 것
@@ -193,10 +204,73 @@ class showing{
 		  this.business.appendChild(div);
       });        
 
+	  this.keyeventcount = "";
 	  this.companybutton.addEventListener('click',(me) => {
 		  var div = this.makediv("select", null, "X");  
 		  this.company.appendChild(div);
-     });        
+		  var text = div.querySelector("input[type='text']");
+
+	      text.addEventListener('input', (me)=>{
+	    	  this.decidecompanysmall(me.target.value, me)})
+
+	      text.addEventListener('blur', (me)=>{
+	    	  this.keyeventcount = "";
+  			  this.subtablediv.style =  "position: absolute;z-index: -100"
+     		        for(var k = this.subtable.childNodes.length - 1; k >= 0; k--){
+     		        	this.subtable.removeChild(this.subtable.childNodes[k]); 
+     		       }	    	  
+	    	  
+          })
+
+	    	  
+	      text.addEventListener('keydown', (e)=>{
+
+	    	  if(e.key == "Enter"){
+       			  this.subtablediv.style =  "position: absolute;z-index: -100"
+       		        for(var k = this.subtable.childNodes.length - 1; k >= 0; k--){
+       		        	this.subtable.removeChild(this.subtable.childNodes[k]); 
+       		       }
+       			  event.preventDefault();
+	    	  }
+	    	  
+	    	  if(e.key == "ArrowDown"){
+	    		  console.log(this.keyeventcount);
+	    		  
+	    		  if(this.keyeventcount ===""){
+	    			  console.log("why1")
+		    		  this.keyeventcount = 0;
+	    		  }else if(this.keyeventcount >= this.subtable.childNodes.length - 1){
+	    			  console.log("why2")
+	    			  return;
+	    		  }else{
+		    		  this.subtable.childNodes[this.keyeventcount].childNodes[0].style = "";
+		    		  this.keyeventcount += 1
+		    		  console.log("why3")
+	    		  }
+	    		  e.target.value = this.subtable.childNodes[this.keyeventcount].innerText;
+	    		  this.subtable.childNodes[this.keyeventcount].childNodes[0].style = "background: yellow;"
+	    		  console.log(this.keyeventcount);
+	    		  
+	    	  }else if(e.key == "ArrowUp"){
+
+	    		  if(this.keyeventcount ==""){
+		    		  this.keyeventcount = 0;
+	    		  }else if(this.keyeventcount <= 0){
+	    		     return;
+	    		  }else{
+		    		  this.subtable.childNodes[this.keyeventcount].childNodes[0].style = "";
+		    		  this.keyeventcount -= 1
+	    		  }
+
+	    		  e.target.value = this.subtable.childNodes[this.keyeventcount].innerText;
+	    		  this.subtable.childNodes[this.keyeventcount].childNodes[0].style = "background: yellow;"
+	    	  }
+	    	  
+	    	  
+	       })
+	    	  
+	  
+	  });        
 
 	  this.coabutton.addEventListener('click',(me) => {
 		  var div = this.makediv(this.coaarr, ["금액", "비율"], "X"); 
@@ -210,15 +284,21 @@ class showing{
 	  });        
 	  
 	  var func = (res) => {
-		  this.coaarr = new Set(res.coa)
-		  this.companyarr = new Set(res.company)
-		  console.log(this.coaarr)
+		  this.coaarr = new Set(res.coa);
+		  this.companyarr = res.company;
+		  this.companyarr.sort();
+		  console.log(this.companyarr)
+		  
+	
+		  
+		  
 	  }
 
       this.ajaxmethod("searcharray", {}, func);
 
 	  
 	  // 테이블 만들기
+	   this.tablearr = {}
 	   this.table = this.maketable();
  	   var temp = document.getElementById("tablediv")
  	   temp.appendChild(this.table);
@@ -390,7 +470,85 @@ class showing{
         button.addEventListener('click',()=>{this.closediv(button.parentNode)});
         return button;
     } 
+    
+    
+    decidecompanysmall(word, me){
+    	
+    	
+    	var count_min = 1; 
+    	var count_max = this.companyarr.length;
+    	
+    	for(var i = 0; i < 15; i++){
+    		
+    		var count = Math.round((count_min + count_max)/2)
+    		
+    		if(count_max - count_min <= 1)
+    		    break
+    		else if(this.companyarr[count] < word ){
+    			count_min = count
+    		}else{
+    			count_max = count
+    		}
+    		
+    	}
+    	
+    	
+    	var arr = []
+    	
+    	for(var i = 0; i < 4; i++){
+        	arr.push(this.companyarr[count_min + i])
+    		if(count_min + i >= this.companyarr.length - 1){
+    			break
+    		}
+    	}
+    	
+    	this.makesubtable(arr, me)
+    	
+    }
+    
+    
+    makesubtable(arr, me){
+        for(var k = this.subtable.childNodes.length - 1; k >= 0; k--){
+        	this.subtable.removeChild(this.subtable.childNodes[k]); 
+       }
 
+    	var pos = me.target.getBoundingClientRect();
+
+    	var left = Math.round(pos.left - 200) + 'px';
+    	var top = Math.round(pos.top - 20) + 'px';
+    	this.subtablediv.style = "position: absolute; left: " + left + "; top: " +top+ ";"
+    	
+    	// processlist 반영하기 
+    	for(var i = 0; i < arr.length;i++){
+    	    this.subtablearr[i] = {}
+    	    var subdiv = this.maketrtd(this.subtablearr[i], 1, null, {"width": "100px"});
+     		this.subtable.appendChild(subdiv)
+    	    this.subtablearr[i][0].innerText = arr[i]
+     		
+     		this.addsubtest(me, i)
+     		this.subtablearr[i][0].addEventListener("click", (real) => {
+     			me.target.value = real.target.innerText;
+     			this.subtablediv.style =  "position: absolute;z-index: -100"
+       		        for(var k = this.subtable.childNodes.length - 1; k >= 0; k--){
+       		        	this.subtable.removeChild(this.subtable.childNodes[k]); 
+       		       }
+
+     		})     		
+    	}
+    	         	
+    }
+    
+
+    addsubtest(me, i){
+ 		this.subtablearr[i][0].addEventListener("mouseover", (real) => {
+ 			if(this.keyeventcount != ""){
+     			this.subtable.childNodes[this.keyeventcount].childNodes[0].style = "";
+ 			}
+ 			this.keyeventcount = i;
+ 			me.target.value = real.target.innerText;
+ 		})
+    }
+    
 	maketable(arr){
 		   
 		   // 이제 집어넣기 

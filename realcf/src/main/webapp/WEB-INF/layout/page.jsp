@@ -56,18 +56,19 @@
         #wrap > #main_lnb { 
             float: left;
             width: 200px;
-            height: 100%;
+            height: 93%;
             
             
         }
         #wrap > #content_wrap {
             float: left;
             left: 200px;
-            height: 100%;
+            height: 93%;
             width: 1200px;
             background: white;
             position: absolute;
             margin: 0 auto;
+           
         }
 
     </style>
